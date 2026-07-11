@@ -139,7 +139,7 @@ function categoryIndex(category, devices) {
   const rows = devices
     .map(
       (device) =>
-        `| [${escapeMarkdownCell(pageTitle(device))}](/devices/catalog/${category}/${device.slug}/) | ${escapeMarkdownCell(connectionNames[device.data.connection] ?? device.data.connection)} | ${escapeMarkdownCell((device.data.provides ?? []).map((item) => item.label).join(', '))} |`,
+        `| [${escapeMarkdownCell(pageTitle(device))}](./${device.slug}/) | ${escapeMarkdownCell(connectionNames[device.data.connection] ?? device.data.connection)} | ${escapeMarkdownCell((device.data.provides ?? []).map((item) => item.label).join(', '))} |`,
     )
     .join('\n');
   const order = Math.max(1, categoryOrder.indexOf(category) + 1);
@@ -153,14 +153,14 @@ function catalogIndex(definitions) {
     .sort(([a], [b]) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b))
     .map(
       ([category, devices]) =>
-        `| [${categoryNames[category] ?? category}](/devices/catalog/${category}/) | ${devices.length} | ${[...new Set(devices.map((device) => connectionNames[device.data.connection] ?? device.data.connection))].join(', ')} |`,
+        `| [${categoryNames[category] ?? category}](./${category}/) | ${devices.length} | ${[...new Set(devices.map((device) => connectionNames[device.data.connection] ?? device.data.connection))].join(', ')} |`,
     )
     .join('\n');
 
   const allRows = definitions
     .map(
       (device) =>
-        `| [${escapeMarkdownCell(pageTitle(device))}](/devices/catalog/${device.category}/${device.slug}/) | ${escapeMarkdownCell(categoryNames[device.category] ?? device.category)} | ${escapeMarkdownCell(connectionNames[device.data.connection] ?? device.data.connection)} | ${escapeMarkdownCell((device.data.provides ?? []).map((item) => item.label).join(', '))} |`,
+        `| [${escapeMarkdownCell(pageTitle(device))}](./${device.category}/${device.slug}/) | ${escapeMarkdownCell(categoryNames[device.category] ?? device.category)} | ${escapeMarkdownCell(connectionNames[device.data.connection] ?? device.data.connection)} | ${escapeMarkdownCell((device.data.provides ?? []).map((item) => item.label).join(', '))} |`,
     )
     .join('\n');
 

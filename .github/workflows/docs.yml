@@ -61,7 +61,8 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          SITE_URL: https://docs.growrig.org
+          SITE_URL: https://growrig.github.io
+          BASE_PATH: /growrig-docs
 
       - name: Configure GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

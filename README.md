@@ -57,7 +57,7 @@ GROWRIG_DEVICES_DIR=/path/to/growrig-platform/devices \
 npm run dev
 ```
 
-Set `SITE_URL` when publishing somewhere other than `https://docs.growrig.org`.
+Set `SITE_URL` and `BASE_PATH` when publishing somewhere other than GitHub Pages at `https://growrig.github.io/growrig-docs/`. For a custom domain at the site root, use `BASE_PATH=/`.
 
 ## Device definition workflow
 
@@ -88,7 +88,7 @@ The included workflow:
 5. runs the smoke test and Astro checks;
 6. builds and deploys `dist/` to GitHub Pages on pushes to `main`.
 
-For a custom domain, add the DNS record and configure the domain in the repository's GitHub Pages settings. Update `SITE_URL` in the workflow environment.
+For a custom domain, add the DNS record and configure the domain in the repository's GitHub Pages settings. Set `SITE_URL` to your domain and `BASE_PATH=/` in the workflow build step.
 
 ## Next useful improvements
 

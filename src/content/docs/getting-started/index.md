@@ -36,7 +36,7 @@ The controller can expose both the ESPHome native API and MQTT. Grow Core select
 
 ## Where to continue
 
-- Read the [project concept](/project/reference/concept/).
-- Study the [architecture](/project/reference/architecture/).
-- Review the [prototype plan](/project/reference/prototype/).
-- Browse the [generated device catalog](/devices/catalog/).
+- Read the [project concept](../project/reference/concept/).
+- Study the [architecture](../project/reference/architecture/).
+- Review the [prototype plan](../project/reference/prototype/).
+- Browse the [generated device catalog](../devices/catalog/).
