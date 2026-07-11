@@ -109,7 +109,7 @@ function deviceDescription(device) {
   return device.data.description ?? `${pageTitle(device)} device definition for GrowRig.`;
 }
 
-function devicePage(device, devicesRoot) {
+function devicePage(device) {
   const title = pageTitle(device);
   const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/devices/${device.category}/${device.slug}/device.yaml`;
   const categoryLabel = categoryNames[device.category] ?? device.category;
@@ -191,7 +191,7 @@ export async function generateDeviceDocs() {
     await writeFile(path.join(categoryDirectory, 'index.md'), categoryIndex(category, devices), 'utf8');
 
     for (const device of devices) {
-      await writeFile(path.join(categoryDirectory, `${device.slug}.md`), devicePage(device, devicesRoot), 'utf8');
+      await writeFile(path.join(categoryDirectory, `${device.slug}.md`), devicePage(device), 'utf8');
     }
   }
 

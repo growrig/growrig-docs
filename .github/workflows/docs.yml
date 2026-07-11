@@ -27,12 +27,19 @@ jobs:
         with:
           repository: growrig/growrig
           path: source/growrig
+          sparse-checkout: |
+            docs
+            ROADMAP.md
+            CONTRIBUTING.md
+            GOVERNANCE.md
 
       - name: Check out GrowRig Platform
         uses: actions/checkout@v4
         with:
           repository: growrig/growrig-platform
           path: source/growrig-platform
+          sparse-checkout: |
+            devices
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
