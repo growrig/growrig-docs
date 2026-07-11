@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.env
+
+# Generated from the GrowRig source repositories.
+src/content/docs/project/reference/
+src/content/docs/devices/catalog/

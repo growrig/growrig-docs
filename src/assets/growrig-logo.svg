@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 54" role="img" aria-labelledby="title">
+  <title id="title">GrowRig</title>
+  <g fill="none" fill-rule="evenodd">
+    <rect width="48" height="48" x="3" y="3" rx="12" fill="#101713"/>
+    <path d="M15 30c0-10 7-18 22-20-1 15-8 23-22 25v-5Z" fill="#8EE8A8"/>
+    <path d="M17 38c6-9 12-14 21-21" stroke="#D8FFE2" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="64" y="38" fill="currentColor" font-family="ui-sans-serif,system-ui,sans-serif" font-size="34" font-weight="760" letter-spacing="-1.5">GrowRig</text>
+  </g>
+</svg>

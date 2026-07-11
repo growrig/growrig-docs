@@ -1,0 +1,14 @@
+---
+title: Project documentation
+description: Architecture, terminology, prototype plans, roadmap, and design decisions maintained in the GrowRig project repository.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The pages in this section are generated from the [`growrig/growrig`](https://github.com/growrig/growrig) repository during every docs build.
+
+<Aside type="note" title="Single source of truth">
+  Edit architecture and project-direction documents in the main `growrig` repository. The docs site copies and wraps those files with Starlight metadata; it does not maintain a competing version.
+</Aside>
+
+The generator imports root project documents, Markdown files under `docs/`, and architecture decision records under `docs/decisions/` when they are present.

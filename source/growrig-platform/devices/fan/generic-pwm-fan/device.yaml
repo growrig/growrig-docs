@@ -1,0 +1,9 @@
+brand: Generic
+model: PC Fan (12V/PWM)
+connection: generic
+description: A physical PWM fan. Assign it to a separately installed controller channel.
+provides:
+  - label: Fan
+    kind: fan
+    role: exhaust
+    entityDomain: ""

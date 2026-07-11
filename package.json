@@ -1,0 +1,26 @@
+{
+  "name": "growrig-docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "dev": "npm run generate && astro dev",
+    "build": "npm run generate && astro build",
+    "preview": "astro preview",
+    "check": "npm run generate && astro check",
+    "test:generated": "node scripts/test-generated.mjs"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.41.3",
+    "astro": "^7.0.7",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^5.8.3"
+  }
+}

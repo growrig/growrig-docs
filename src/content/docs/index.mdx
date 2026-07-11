@@ -1,0 +1,37 @@
+---
+title: GrowRig documentation
+description: Open, local-first monitoring and automation for controlled indoor growing.
+template: splash
+hero:
+  tagline: Open hardware, local control, replaceable devices, and automation you can understand.
+  actions:
+    - text: Understand GrowRig
+      link: /getting-started/
+      variant: primary
+    - text: Browse supported devices
+      link: /devices/catalog/
+      variant: secondary
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## One ecosystem, clear boundaries
+
+<CardGrid>
+  <Card title="Local-first">
+    Grow Core, Home Assistant, firmware, and historical data continue to work without a mandatory cloud account.
+  </Card>
+  <Card title="Replaceable hardware">
+    Device support is described as structured capabilities instead of being hard-wired to a single vendor.
+  </Card>
+  <Card title="Safe by layers">
+    Hardware, controller firmware, Grow Core, networking, and the UI each have explicit safety responsibilities.
+  </Card>
+  <Card title="Generated catalog">
+    Device reference pages are generated from the same YAML definitions consumed by the platform.
+  </Card>
+</CardGrid>
+
+## Current focus
+
+GrowRig is in the concept and prototype stage. The first vertical slice connects an ESPHome-based fan controller, Home Assistant, Grow Core, and a small SvelteKit interface while preserving safe local fallback behavior.
