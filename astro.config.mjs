@@ -1,8 +1,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
-const site = process.env.SITE_URL ?? 'https://growrig.github.io';
-const base = process.env.BASE_PATH ?? '/growrig-docs';
+const site = process.env.SITE_URL ?? 'https://growrig.dev';
+const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   site,
