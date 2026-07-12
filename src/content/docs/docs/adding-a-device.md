@@ -60,7 +60,7 @@ smart plug), so simple one-off devices stay a one-file definition.
 ### Capabilities
 
 `provides` declares the driver's semantic capabilities and how they bind to Home
-Assistant entities. See [the device model](/documentation/device-model/) for how
+Assistant entities. See [the device model](/docs/device-model/) for how
 capabilities and roles work.
 
 ## Add a setup guide (optional)

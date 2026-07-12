@@ -45,5 +45,5 @@ go run ./cmd/growcore -config growcore.dev.yaml
 ```
 
 `${ENV_VAR}` references in the config are expanded at load, so tokens stay out of
-version control. See [Configuration](/documentation/configuration/) for the full
+version control. See [Configuration](/docs/configuration/) for the full
 reference.

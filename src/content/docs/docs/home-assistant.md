@@ -20,7 +20,7 @@ chosen purely by configuration:
 - **Remote Home Assistant** — for local development, point Grow Core at
   `http://homeassistant.local:8123` with a long-lived access token.
 
-See [Configuration](/documentation/configuration/) for the exact files and modes.
+See [Configuration](/docs/configuration/) for the exact files and modes.
 
 ## Commanding fans
 

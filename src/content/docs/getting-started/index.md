@@ -32,8 +32,8 @@ The control path for the first prototype looks like this:
 Grow App  ↔  Grow Core  ↔  Home Assistant (or MQTT)  ↔  ESPHome Grow Controller  ↔  fans · sensors · lights
 ```
 
-Read [Concept](/documentation/concept/) for the *why*, and
-[Architecture](/documentation/architecture/) for the *how*.
+Read [Concept](/docs/concept/) for the *why*, and
+[Architecture](/docs/architecture/) for the *how*.
 
 ## Run it without hardware
 
@@ -68,5 +68,5 @@ desired fan speed.
 ## Next steps
 
 - [Install Grow Core on Home Assistant](/getting-started/install/) as a local add-on.
-- Learn how devices are described in the [device model](/documentation/device-model/).
+- Learn how devices are described in the [device model](/docs/device-model/).
 - Browse the [supported devices](/devices/) and see what already works.

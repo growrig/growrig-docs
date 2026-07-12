@@ -62,7 +62,7 @@ brand, model, connection type, Home Assistant integration, and the semantic
 capabilities. An optional `guide.md` beside it adds setup notes and limitations.
 
 These same definitions power the [supported-devices catalog](/devices/) on this site.
-To add one, see [Adding a device](/documentation/adding-a-device/).
+To add one, see [Adding a device](/docs/adding-a-device/).
 
 ## Policy model
 

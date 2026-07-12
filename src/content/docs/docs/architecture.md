@@ -52,7 +52,7 @@ without touching domain logic.
 Home Assistant remains responsible for device discovery, third-party integrations,
 current device state, protocol translation, and generic notifications. Grow Core does
 **not** mirror Home Assistant internals into its own domain model — see
-[Home Assistant integration](/documentation/home-assistant/) and
+[Home Assistant integration](/docs/home-assistant/) and
 [data ownership](#data-ownership).
 
 ## The apps

@@ -45,7 +45,7 @@ export default defineConfig({
         },
         {
           label: 'Documentation',
-          items: [{ autogenerate: { directory: 'documentation' } }],
+          items: [{ autogenerate: { directory: 'docs' } }],
         },
       ],
     }),
