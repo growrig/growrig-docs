@@ -1,72 +1,63 @@
 ---
-title: Getting started
-description: What GrowRig is, how the pieces fit together, and how to run the whole system on your machine with no hardware.
+title: What is GrowRig?
+description: A friendly introduction to GrowRig — open, local-first monitoring and automation for indoor growing.
 sidebar:
   order: 1
-  label: Overview
+  label: What is GrowRig?
 ---
 
-GrowRig is an open-source, **local-first** ecosystem for monitoring and automating
-grow tents, boxes, rooms, and other small controlled environments. It combines an
-integrated product experience with Home Assistant compatibility, open controller
-hardware, local autonomous operation, and replaceable equipment.
+GrowRig helps you **monitor and automate the climate** inside a grow tent, box, or
+room — the temperature, humidity, airflow, and lighting your plants live in — so you
+don't have to babysit it by hand.
 
-You do not need proprietary buses, a mandatory cloud account, or a closed mobile
-app. And you can start **today, without any hardware** — the platform ships with a
-built-in simulator that stands in for a real grow controller.
+Think of it as the "brain" for your grow space. You tell it the conditions you want,
+and it keeps the fans and equipment working to hold those conditions, day and night.
 
-## The parts
+## Who it's for
 
-| Part | Responsibility |
-| --- | --- |
-| **Grow App** | Onboarding, dashboards, alerts, recipes, diagnostics, and flashing. |
-| **Grow Core** | The grow-domain model, control policies, history, and APIs. |
-| **Grow Hub** | A local computer running Home Assistant OS, Grow Core, and storage. |
-| **Grow Gateway** | Isolated Wi-Fi, routing, firewalling, and optional remote access. |
-| **Grow Controller** | Local equipment control, monitoring, and failsafe behavior. |
-| **Grow Node** | A smaller sensor or actuator with a narrow role. |
+You don't need to be an engineer. GrowRig is built for:
 
-The control path for the first prototype looks like this:
+- **Beginners** setting up their first tent who want it to "just work".
+- **Hobbyists** who've outgrown manual timers and want real control and history.
+- **Tinkerers** who love open hardware and want to see and change how everything works.
 
-```text
-Grow App  ↔  Grow Core  ↔  Home Assistant (or MQTT)  ↔  ESPHome Grow Controller  ↔  fans · sensors · lights
-```
+If you already run [Home Assistant](https://www.home-assistant.io/), you're a step
+ahead — GrowRig builds on top of it. If you don't, that's fine; this guide walks you
+through the whole picture.
 
-Read [Concept](/docs/concept/) for the *why*, and
-[Architecture](/docs/architecture/) for the *how*.
+## What makes it different
 
-## Run it without hardware
+Most grow controllers lock you into one brand's app, cloud account, and accessories.
+GrowRig takes the opposite approach:
 
-The platform's current vertical slice runs end-to-end on a simulator: a Go control
-engine, a live API, and a SvelteKit dashboard. No Home Assistant or ESP32 required.
+- **Local-first** — it runs on a small computer in your home. No mandatory cloud
+  account, and it keeps working without internet.
+- **Your choice of gear** — GrowRig describes equipment by *what it does* (a fan, a
+  sensor, a light), so you can mix brands and swap parts without starting over.
+- **Understandable and safe** — every automatic decision is visible and explainable,
+  and your equipment has safe fallback behavior if something loses connection.
+- **Open** — the software, hardware designs, and device profiles are all open source.
 
-You'll run two processes.
+## How you'll use it
 
-**1. Grow Core** (Go 1.24+):
+The everyday experience is meant to be simple:
 
-```bash
-cd growcore
-go run ./cmd/growcore -config growcore.sim.yaml   # listens on :8080
-```
+1. Tell GrowRig about your grow space and the equipment in it.
+2. Set your target temperature and humidity (or pick a recipe).
+3. Let it run — watch live readings, get alerts, and review history.
 
-**2. Grow App Web** (Node 20+):
+Behind that simplicity is a small stack of cooperating parts. The next page,
+[How it works](/getting-started/how-it-works/), explains them in plain language.
 
-```bash
-cd web
-npm install
-npm run dev                                        # http://localhost:5173
-```
-
-The web app talks to Grow Core at `http://localhost:8080` by default. Set
-`VITE_GROWCORE_URL` to point it elsewhere.
-
-Open the dashboard, go to **Setup**, and lower the temperature target below the
-current reading — the exhaust fan ramps up on the dashboard within a second. That
-is the reconciliation engine turning *current vs. target temperature* into a
-desired fan speed.
+:::note[Where the project is today]
+GrowRig is young and being built in the open. Some of what you'll read here describes
+where it's headed. We'll call out what already works as we go, and the
+[roadmap](/docs/roadmap/) tracks the rest.
+:::
 
 ## Next steps
 
-- [Install Grow Core on Home Assistant](/getting-started/install/) as a local add-on.
-- Learn how devices are described in the [device model](/docs/device-model/).
-- Browse the [supported devices](/devices/) and see what already works.
+- **[How it works](/getting-started/how-it-works/)** — the pieces and the control loop.
+- **[What you'll need](/getting-started/what-you-need/)** — a starter equipment guide if
+  you're beginning from nothing.
+- **[Setting it up](/getting-started/setup/)** — get GrowRig running.

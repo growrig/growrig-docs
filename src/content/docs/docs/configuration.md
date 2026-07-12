@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-Grow Core is configured with YAML. The **same binary** runs in three modes, selected
+Grow Core is configured with YAML. The **same binary** runs in different modes, selected
 by `adapter.type` and the config file you pass with `-config`.
 
 ## Modes
@@ -14,7 +14,6 @@ by `adapter.type` and the config file you pass with `-config`.
 | --- | --- | --- |
 | `growcore.yaml` | Default — HAOS add-on | Supervisor proxy (`http://supervisor/core`, `$SUPERVISOR_TOKEN`) |
 | `growcore.dev.yaml` | Local dev vs. remote HA | `http://homeassistant.local:8123` + long-lived token |
-| `growcore.sim.yaml` | Offline simulator | none |
 
 `${ENV_VAR}` references are expanded at load, so secrets stay out of version control:
 
@@ -24,8 +23,7 @@ go run ./cmd/growcore -config growcore.dev.yaml
 ```
 
 The config declares environments, devices, and how each device's sensors and fan
-channels bind to Home Assistant entities. Running with no config file uses the
-built-in simulator defaults.
+channels bind to Home Assistant entities.
 
 ### Flags
 

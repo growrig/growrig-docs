@@ -33,8 +33,7 @@ mappings.
 
 The config declares environments and devices, and binds each device's sensors and fan
 channels to Home Assistant entities. Edit the `sensor.*` and `fan.*` entity IDs to
-match your ESPHome controller. Running with no config at all falls back to the
-built-in [simulator](/getting-started/#run-it-without-hardware).
+match your ESPHome controller.
 
 ## Who owns what
 
