@@ -67,7 +67,7 @@ const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sor
               data-connection={d.connectionLabel}
               data-search={`${d.title} ${d.brand} ${d.connectionLabel} ${d.description ?? ''}`.toLowerCase()}
             >
-              <span class="gr-device-card__logo">{(d.brand || d.title).slice(0, 2).toUpperCase()}</span>
+              {d.image ? <img class="gr-device-card__image" src={d.image} alt="" /> : <span class="gr-device-card__logo">{(d.brand || d.title).slice(0, 2).toUpperCase()}</span>}
               <span class="gr-device-card__brand">{d.brand || cat.name}</span>
               <h3>{d.model || d.title}</h3>
               {d.description && <p>{d.description}</p>}

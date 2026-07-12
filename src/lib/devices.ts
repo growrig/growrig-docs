@@ -43,9 +43,11 @@ export interface Product {
   category: string;
   slug: string; // unique within its category
   brand: string;
+  vendor?: string;
   model: string;
   title: string;
   description?: string;
+  image?: string;
   specs?: Record<string, number>;
   // Inherited from the backing driver:
   connection: string;
@@ -157,8 +159,10 @@ function categoryMeta(slug: string): CategoryMeta {
 interface Variant {
   id: string;
   brand?: string;
+  vendor?: string;
   model?: string;
   description?: string;
+  image?: string;
   specs?: Record<string, number>;
 }
 
@@ -205,6 +209,15 @@ export function loadCategories(): CategoryWithProducts[] {
         driverModel,
       };
 
+      const imageData = (filename?: string): string | undefined => {
+        if (!filename) return undefined;
+        const imagePath = path.join(categoryPath, driverSlug, filename);
+        if (!existsSync(imagePath)) return undefined;
+        const ext = path.extname(filename).toLowerCase();
+        const mime = ext === '.svg' ? 'image/svg+xml' : ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : undefined;
+        return mime ? `data:${mime};base64,${readFileSync(imagePath).toString('base64')}` : undefined;
+      };
+
       const variants: Variant[] = Array.isArray(data.products) ? data.products : [];
       if (variants.length > 0) {
         for (const v of variants) {
@@ -214,7 +227,9 @@ export function loadCategories(): CategoryWithProducts[] {
             ...shared,
             slug: v.id,
             brand,
+            vendor: v.vendor ?? data.vendor,
             model,
+            image: imageData(v.image ?? data.image),
             title: `${brand} ${model}`.trim(),
             description: v.description?.trim() || data.description?.trim() || undefined,
             specs: v.specs,
@@ -226,7 +241,9 @@ export function loadCategories(): CategoryWithProducts[] {
           ...shared,
           slug: driverSlug,
           brand: driverBrand,
+          vendor: data.vendor,
           model: driverModel,
+          image: imageData(data.image),
           title: `${driverBrand} ${driverModel}`.trim(),
           description: data.description?.trim() || undefined,
           specs: undefined,

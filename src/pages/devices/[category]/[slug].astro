@@ -60,6 +60,7 @@ if (device.author) meta.push(['Maintainer', device.author]);
     </nav>
     <h1>{device.title}</h1>
     <p>{description}</p>
+    {device.image && <img class="gr-device-hero" src={device.image} alt={device.title} />}
   </div>
 
   <div class="gr-container gr-detail">

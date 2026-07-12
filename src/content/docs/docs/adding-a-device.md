@@ -34,8 +34,10 @@ connection: n/a
 description: A passive enclosure recorded for its air volume.
 products:
   - id: mars-hydro-2x2
+    vendor: mars-hydro
     brand: Mars Hydro
     model: 2'×2' Grow Tent
+    image: mars-hydro-2x2.webp
     specs: { widthCm: 60, depthCm: 60, heightCm: 140 }
   - id: vivosun-4x4
     brand: VIVOSUN
@@ -56,6 +58,20 @@ as display metadata. Add keys freely — no schema change required.
 
 A driver with **no** `products:` is itself a single product (e.g. the Tapo P110
 smart plug), so simple one-off devices stay a one-file definition.
+
+### Vendor and product artwork
+
+Set `vendor` to a stable vendor id from `growrig-platform/vendors/<vendor-id>/`.
+Each vendor directory contains `vendor.yaml` and may contain a reusable real logo. The
+[vendor catalogue](/vendors/) and device pages both read those shared files.
+
+Until a logo is provided, `color` and `background` in `vendor.yaml` render a
+branded initials fallback. Add `logo: filename.svg` (PNG, JPEG, and WebP also
+work) after placing the real artwork beside `vendor.yaml`.
+
+Set the optional `image` field on a driver or product to an SVG, PNG, JPEG, or
+WebP file beside `device.yaml`. Variant images override the driver image; a
+driver image is inherited by all variants that do not specify their own.
 
 ### Capabilities
 

@@ -1,0 +1,25 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { loadVendors } from '../../lib/vendors';
+const vendors = loadVendors();
+---
+<SiteLayout title="Vendors — GrowRig" description="Manufacturers represented in the GrowRig supported-device catalogue.">
+  <main class="gr-page">
+    <div class="gr-container">
+      <div class="gr-page-heading">
+        <p class="gr-eyebrow">Catalogue</p>
+        <h1>Vendors</h1>
+        <p>Manufacturers represented by supported GrowRig device profiles.</p>
+      </div>
+      <div class="gr-vendor-grid">
+        {vendors.map((vendor) => (
+          <a class="gr-vendor-card" href={vendor.website} target="_blank" rel="noopener">
+            {vendor.logo ? <img src={vendor.logo} alt={`${vendor.name} logo`} /> : <span class="gr-vendor-card__fallback" style={`--vendor-color:${vendor.color ?? '#34b16a'};--vendor-background:${vendor.background ?? '#17231c'}`}>{vendor.name.split(/\s+/).map((word) => word[0]).join('').slice(0, 3)}</span>}
+            <strong>{vendor.name}</strong>
+            <span>{vendor.productCount} supported product{vendor.productCount === 1 ? '' : 's'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</SiteLayout>

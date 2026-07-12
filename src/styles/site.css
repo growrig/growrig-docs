@@ -440,6 +440,15 @@ img {
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
+.gr-vendor-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; }
+.gr-vendor-card { display:flex; min-height:130px; flex-direction:column; align-items:center; justify-content:center; gap:.8rem; padding:1.25rem; border:1px solid var(--gr-border); border-radius:14px; background:var(--gr-surface); }
+.gr-vendor-card:hover { border-color:var(--gr-accent); }
+.gr-vendor-card img { width:180px; height:60px; object-fit:contain; border-radius:10px; }
+.gr-vendor-card > span:not(.gr-vendor-card__fallback) { color:var(--gr-muted); font-size:.85rem; }
+.gr-vendor-card__fallback { display:flex; width:72px; height:72px; align-items:center; justify-content:center; border-radius:18px; background:var(--vendor-background); color:var(--vendor-color); font-size:1.35rem; font-weight:800; letter-spacing:.04em; }
+.gr-device-card__image { width:100%; aspect-ratio:16/9; object-fit:contain; border-radius:10px; background:var(--gr-surface-2); }
+.gr-device-hero { display:block; width:min(100%,640px); max-height:360px; margin-top:1.5rem; object-fit:contain; border-radius:16px; background:var(--gr-surface); }
+
 .gr-device-card {
   display: flex;
   flex-direction: column;
