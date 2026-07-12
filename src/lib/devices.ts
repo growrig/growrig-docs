@@ -34,35 +34,45 @@ export interface Capability {
   role?: string;
 }
 
-export interface Device {
+/**
+ * A concrete supported product, flattened from a driver's `products` list (or
+ * the driver itself when it lists none). Driver-level fields (capabilities, HA
+ * integration, connection) are inherited so a product page is self-contained.
+ */
+export interface Product {
   category: string;
-  slug: string;
+  slug: string; // unique within its category
   brand: string;
   model: string;
   title: string;
+  description?: string;
+  specs?: Record<string, number>;
+  // Inherited from the backing driver:
   connection: string;
   connectionLabel: string;
-  description?: string;
-  version?: string;
-  author?: string;
   haIntegration?: string;
   documentation?: string;
+  version?: string;
+  author?: string;
   provides: Capability[];
   guide?: string;
+  driverSlug: string;
+  driverBrand: string;
+  driverModel: string;
+  /** True when this product is one of several under a generic backing driver. */
+  viaDriver: boolean;
 }
 
 export interface CategoryMeta {
   slug: string;
   name: string;
-  /** Short one-line summary shown on the category card. */
   tagline: string;
-  /** Inline SVG icon markup (no wrapping element). */
   icon: string;
   order: number;
 }
 
-export interface CategoryWithDevices extends CategoryMeta {
-  devices: Device[];
+export interface CategoryWithProducts extends CategoryMeta {
+  products: Product[];
 }
 
 const connectionNames: Record<string, string> = {
@@ -74,10 +84,21 @@ const connectionNames: Record<string, string> = {
   'n/a': 'Manual',
 };
 
-/**
- * Category metadata. `icon` is inline SVG path content sized for a 24x24
- * viewBox with `currentColor` strokes, matching the Home-Assistant-style grid.
- */
+/** Human labels + units for known spec keys; unknown keys are title-cased. */
+export const SPEC_META: Record<string, { label: string; unit?: string }> = {
+  sizeMm: { label: 'Fan size', unit: 'mm' },
+  maxRpm: { label: 'Max speed', unit: 'RPM' },
+  airflowCfm: { label: 'Airflow', unit: 'CFM' },
+  staticPressureMmH2O: { label: 'Static pressure', unit: 'mmH₂O' },
+  startingVoltage: { label: 'Starting voltage', unit: 'V' },
+  ductSizeInches: { label: 'Duct size', unit: 'in' },
+  noiseDba: { label: 'Noise', unit: 'dBA' },
+  widthCm: { label: 'Width', unit: 'cm' },
+  depthCm: { label: 'Depth', unit: 'cm' },
+  heightCm: { label: 'Height', unit: 'cm' },
+  wattage: { label: 'Rated power', unit: 'W' },
+};
+
 const CATEGORIES: Record<string, Omit<CategoryMeta, 'slug'>> = {
   controller: {
     name: 'Controllers',
@@ -117,7 +138,7 @@ const CATEGORIES: Record<string, Omit<CategoryMeta, 'slug'>> = {
   },
   tent: {
     name: 'Grow tents',
-    tagline: 'Reference enclosures and their layouts.',
+    tagline: 'Reference enclosures and their dimensions.',
     order: 7,
     icon: '<path d="M3 21V6l9-3 9 3v15M3 21h18M12 3v18M7 21v-6l5-2 5 2v6"/>',
   },
@@ -133,53 +154,90 @@ function categoryMeta(slug: string): CategoryMeta {
   return { slug, ...meta };
 }
 
-let cache: CategoryWithDevices[] | null = null;
+interface Variant {
+  id: string;
+  brand?: string;
+  model?: string;
+  description?: string;
+  specs?: Record<string, number>;
+}
 
-/** Read every `device.yaml`, grouped by category, sorted for display. */
-export function loadCategories(): CategoryWithDevices[] {
+let cache: CategoryWithProducts[] | null = null;
+
+/** Read every driver `device.yaml`, flatten to products, grouped by category. */
+export function loadCategories(): CategoryWithProducts[] {
   if (cache) return cache;
 
   const devicesRoot = resolveDevicesRoot();
-  const categories: CategoryWithDevices[] = [];
+  const categories: CategoryWithProducts[] = [];
 
   for (const categoryEntry of readdirSync(devicesRoot, { withFileTypes: true })) {
     if (!categoryEntry.isDirectory()) continue;
     const categorySlug = categoryEntry.name;
     const categoryPath = path.join(devicesRoot, categorySlug);
-    const devices: Device[] = [];
+    const products: Product[] = [];
 
-    for (const deviceEntry of readdirSync(categoryPath, { withFileTypes: true })) {
-      if (!deviceEntry.isDirectory()) continue;
-      const slug = deviceEntry.name;
-      const yamlPath = path.join(categoryPath, slug, 'device.yaml');
+    for (const driverEntry of readdirSync(categoryPath, { withFileTypes: true })) {
+      if (!driverEntry.isDirectory()) continue;
+      const driverSlug = driverEntry.name;
+      const yamlPath = path.join(categoryPath, driverSlug, 'device.yaml');
       if (!existsSync(yamlPath)) continue;
 
       const data = parseYaml(readFileSync(yamlPath, 'utf8')) ?? {};
-      const guidePath = path.join(categoryPath, slug, 'guide.md');
+      const guidePath = path.join(categoryPath, driverSlug, 'guide.md');
       const guide = existsSync(guidePath) ? readFileSync(guidePath, 'utf8') : undefined;
 
       const connection = String(data.connection ?? 'n/a');
-      devices.push({
+      const driverBrand = String(data.brand ?? '').trim();
+      const driverModel = String(data.model ?? '').trim();
+      const shared = {
         category: categorySlug,
-        slug,
-        brand: String(data.brand ?? '').trim(),
-        model: String(data.model ?? '').trim(),
-        title: `${data.brand ?? ''} ${data.model ?? ''}`.trim(),
         connection,
         connectionLabel: connectionNames[connection] ?? connection,
-        description: data.description?.trim() || undefined,
+        haIntegration: data.haIntegration as string | undefined,
+        documentation: data.documentation as string | undefined,
         version: data.version ? String(data.version) : undefined,
-        author: data.author,
-        haIntegration: data.haIntegration,
-        documentation: data.documentation,
-        provides: Array.isArray(data.provides) ? data.provides : [],
+        author: data.author as string | undefined,
+        provides: (Array.isArray(data.provides) ? data.provides : []) as Capability[],
         guide,
-      });
+        driverSlug,
+        driverBrand,
+        driverModel,
+      };
+
+      const variants: Variant[] = Array.isArray(data.products) ? data.products : [];
+      if (variants.length > 0) {
+        for (const v of variants) {
+          const brand = (v.brand ?? driverBrand).trim();
+          const model = (v.model ?? driverModel).trim();
+          products.push({
+            ...shared,
+            slug: v.id,
+            brand,
+            model,
+            title: `${brand} ${model}`.trim(),
+            description: v.description?.trim() || data.description?.trim() || undefined,
+            specs: v.specs,
+            viaDriver: true,
+          });
+        }
+      } else {
+        products.push({
+          ...shared,
+          slug: driverSlug,
+          brand: driverBrand,
+          model: driverModel,
+          title: `${driverBrand} ${driverModel}`.trim(),
+          description: data.description?.trim() || undefined,
+          specs: undefined,
+          viaDriver: false,
+        });
+      }
     }
 
-    if (devices.length === 0) continue;
-    devices.sort((a, b) => a.title.localeCompare(b.title));
-    categories.push({ ...categoryMeta(categorySlug), devices });
+    if (products.length === 0) continue;
+    products.sort((a, b) => a.title.localeCompare(b.title));
+    categories.push({ ...categoryMeta(categorySlug), products });
   }
 
   categories.sort((a, b) => a.order - b.order);
@@ -187,10 +245,10 @@ export function loadCategories(): CategoryWithDevices[] {
   return categories;
 }
 
-export function allDevices(): Device[] {
-  return loadCategories().flatMap((c) => c.devices);
+export function allProducts(): Product[] {
+  return loadCategories().flatMap((c) => c.products);
 }
 
-export function findCategory(slug: string): CategoryWithDevices | undefined {
+export function findCategory(slug: string): CategoryWithProducts | undefined {
   return loadCategories().find((c) => c.slug === slug);
 }

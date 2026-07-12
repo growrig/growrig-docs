@@ -1,21 +1,21 @@
 ---
 import { marked } from 'marked';
 import SiteLayout from '../../../layouts/SiteLayout.astro';
-import { loadCategories, findCategory } from '../../../lib/devices';
+import { loadCategories, findCategory, SPEC_META } from '../../../lib/devices';
 
 export function getStaticPaths() {
   return loadCategories().flatMap((cat) =>
-    cat.devices.map((d) => ({ params: { category: cat.slug, slug: d.slug } })),
+    cat.products.map((d) => ({ params: { category: cat.slug, slug: d.slug } })),
   );
 }
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const { category, slug } = Astro.params;
 const cat = findCategory(category!)!;
-const device = cat.devices.find((d) => d.slug === slug)!;
+const device = cat.products.find((d) => d.slug === slug)!;
 
 const description = device.description ?? `${device.title} device profile for GrowRig.`;
-const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/devices/${category}/${slug}/device.yaml`;
+const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/devices/${category}/${device.driverSlug}/device.yaml`;
 
 // Render the optional guide, dropping its leading H1 (shown as the page title).
 let guideHtml = '';
@@ -24,12 +24,27 @@ if (device.guide) {
   guideHtml = await marked.parse(withoutTitle);
 }
 
+// Turn the free-form spec map into labelled rows, unknown keys title-cased.
+const specRows = Object.entries(device.specs ?? {}).map(([key, value]) => {
+  const meta = SPEC_META[key];
+  const label = meta?.label ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+  return { label, value: meta?.unit ? `${value} ${meta.unit}` : String(value) };
+});
+
+// Derive tent air volume when full dimensions are present.
+const s = device.specs ?? {};
+if (s.widthCm && s.depthCm && s.heightCm) {
+  const m3 = (s.widthCm * s.depthCm * s.heightCm) / 1_000_000;
+  specRows.push({ label: 'Air volume', value: `${m3.toFixed(2)} m³` });
+}
+
 const meta: Array<[string, string]> = [
   ['Category', cat.name],
   ['Brand', device.brand],
   ['Model', device.model],
   ['Connection', device.connectionLabel],
 ];
+if (device.viaDriver) meta.push(['Works via', `${device.driverBrand} ${device.driverModel}`.trim()]);
 if (device.version) meta.push(['Definition', `v${device.version}`]);
 if (device.author) meta.push(['Maintainer', device.author]);
 ---
@@ -49,6 +64,26 @@ if (device.author) meta.push(['Maintainer', device.author]);
 
   <div class="gr-container gr-detail">
     <div class="gr-prose">
+      {
+        specRows.length > 0 && (
+          <>
+            <h2>Specifications</h2>
+            <div class="gr-table-wrap">
+              <table class="gr-table">
+                <tbody>
+                  {specRows.map((row) => (
+                    <tr>
+                      <th style="width: 40%;">{row.label}</th>
+                      <td>{row.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )
+      }
+
       <h2>Capabilities</h2>
       {
         device.provides.length > 0 ? (
@@ -127,7 +162,7 @@ if (device.author) meta.push(['Maintainer', device.author]);
         }
       </dl>
       <a class="gr-btn gr-btn--ghost" href={definitionUrl} target="_blank" rel="noopener" style="width:100%; justify-content:center; margin-top:1.25rem;">
-        View source definition ↗
+        View driver definition ↗
       </a>
     </aside>
   </div>

@@ -1,10 +1,10 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { loadCategories, allDevices } from '../lib/devices';
+import { loadCategories, allProducts } from '../lib/devices';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const categories = loadCategories();
-const deviceCount = allDevices().length;
+const deviceCount = allProducts().length;
 
 const features = [
   {
@@ -110,7 +110,7 @@ const flow = [
       <div class="gr-section__head">
         <h2>Works with your gear</h2>
         <p>
-          {deviceCount} device profiles across {categories.length} categories, generated from the same
+          {deviceCount} supported products across {categories.length} categories, from the same
           definitions the platform uses. Browse by category, just like Home Assistant integrations.
         </p>
       </div>
@@ -123,7 +123,7 @@ const flow = [
               </span>
               <h3>{cat.name}</h3>
               <span class="gr-cat-card__count">
-                {cat.devices.length} device{cat.devices.length === 1 ? '' : 's'}
+                {cat.products.length} device{cat.products.length === 1 ? '' : 's'}
               </span>
             </a>
           ))

@@ -11,12 +11,12 @@ const { category } = Astro.params;
 const cat = findCategory(category!)!;
 
 // Unique connection types present in this category, for filter chips.
-const connections = [...new Set(cat.devices.map((d) => d.connectionLabel))].sort();
+const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sort();
 ---
 
 <SiteLayout
   title={`${cat.name} — Supported devices — GrowRig`}
-  description={`${cat.devices.length} ${cat.name.toLowerCase()} that work with GrowRig.`}
+  description={`${cat.products.length} ${cat.name.toLowerCase()} that work with GrowRig.`}
 >
   <div class="gr-container gr-page-head">
     <nav class="gr-breadcrumb">
@@ -60,7 +60,7 @@ const connections = [...new Set(cat.devices.map((d) => d.connectionLabel))].sort
 
       <div class="gr-device-grid" id="gr-cat-grid">
         {
-          cat.devices.map((d) => (
+          cat.products.map((d) => (
             <a
               class="gr-device-card"
               href={`${base}/devices/${d.category}/${d.slug}/`}

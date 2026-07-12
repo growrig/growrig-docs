@@ -1,14 +1,14 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { loadCategories, allDevices } from '../../lib/devices';
+import { loadCategories, allProducts } from '../../lib/devices';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const categories = loadCategories();
-const devices = allDevices();
-const total = devices.length;
+const products = allProducts();
+const total = products.length;
 
 // Lightweight data for client-side search.
-const searchData = devices.map((d) => ({
+const searchData = products.map((d) => ({
   title: d.title,
   brand: d.brand,
   category: d.category,
@@ -61,7 +61,7 @@ const searchData = devices.map((d) => ({
               <h3>{cat.name}</h3>
               <p>{cat.tagline}</p>
               <span class="gr-cat-card__count">
-                {cat.devices.length} device{cat.devices.length === 1 ? '' : 's'}
+                {cat.products.length} device{cat.products.length === 1 ? '' : 's'}
               </span>
             </a>
           ))
