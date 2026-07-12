@@ -1,0 +1,196 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { loadCategories, allDevices } from '../lib/devices';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const categories = loadCategories();
+const deviceCount = allDevices().length;
+
+const features = [
+  {
+    title: 'Local-first',
+    body: 'Grow Core, Home Assistant, firmware, and history keep working without a mandatory cloud account or internet connection.',
+    icon: '<path d="M4 7h16M4 7l1.5 12a2 2 0 0 0 2 1.8h9a2 2 0 0 0 2-1.8L20 7M9 4h6l1 3H8l1-3Z"/><path d="M12 11v6M9 14h6"/>',
+  },
+  {
+    title: 'Replaceable hardware',
+    body: 'Devices are described as structured capabilities, not hard-wired to a single vendor. Swap a fan or sensor without rewriting your setup.',
+    icon: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a1.5 1.5 0 0 0 2 2l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3Z"/>',
+  },
+  {
+    title: 'Safe by layers',
+    body: 'Hardware, controller firmware, Grow Core, networking, and the UI each own explicit safety responsibilities and fallbacks.',
+    icon: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path d="M9 12l2 2 4-4"/>',
+  },
+  {
+    title: 'Open and understandable',
+    body: 'Source, APIs, protocols, and device profiles are published. Every automated decision can be simulated, observed, and explained.',
+    icon: '<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="12" cy="12" r="3"/>',
+  },
+];
+
+const flow = [
+  { label: 'Grow App', note: 'Setup, dashboards, alerts' },
+  { label: 'Grow Core', note: 'Domain model + control law' },
+  { label: 'Home Assistant', note: 'Discovery + protocols' },
+  { label: 'Grow Controller', note: 'Local PWM + failsafes' },
+  { label: 'Equipment', note: 'Fans · sensors · lights' },
+];
+---
+
+<SiteLayout
+  title="GrowRig — open, local-first grow automation"
+  description="Open hardware, local control, replaceable devices, and automation you can understand for controlled indoor growing."
+>
+  <!-- Hero -->
+  <section class="gr-hero">
+    <div class="gr-container gr-hero__inner">
+      <span class="gr-eyebrow"><span class="dot"></span> Concept &amp; prototype · open source</span>
+      <h1>Grow automation you <span class="accent">actually control</span></h1>
+      <p class="lead">
+        GrowRig is an open, local-first ecosystem for monitoring and automating grow tents, boxes,
+        and rooms — built on Home Assistant, open controller hardware, and equipment you can replace.
+      </p>
+      <div class="gr-hero__actions">
+        <a class="gr-btn gr-btn--primary" href={`${base}/getting-started/`}>Get started</a>
+        <a class="gr-btn gr-btn--ghost" href={`${base}/devices/`}>Browse supported devices →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="gr-section">
+    <div class="gr-container">
+      <div class="gr-section__head">
+        <h2>One ecosystem, clear boundaries</h2>
+        <p>The integration of a commercial product, without the lock-in.</p>
+      </div>
+      <div class="gr-grid">
+        {
+          features.map((f) => (
+            <article class="gr-card">
+              <span class="gr-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={f.icon} />
+              </span>
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="gr-section" style="background: var(--gr-surface); border-block: 1px solid var(--gr-border);">
+    <div class="gr-container">
+      <div class="gr-section__head center">
+        <h2>How it works</h2>
+        <p>Intent flows down; state and safety flow up. Each layer keeps working on its own.</p>
+      </div>
+      <ol class="gr-flow">
+        {
+          flow.map((step, i) => (
+            <li class="gr-flow__step">
+              <span class="gr-flow__num">{i + 1}</span>
+              <div>
+                <strong>{step.label}</strong>
+                <span>{step.note}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Supported devices teaser -->
+  <section class="gr-section">
+    <div class="gr-container">
+      <div class="gr-section__head">
+        <h2>Works with your gear</h2>
+        <p>
+          {deviceCount} device profiles across {categories.length} categories, generated from the same
+          definitions the platform uses. Browse by category, just like Home Assistant integrations.
+        </p>
+      </div>
+      <div class="gr-cat-grid">
+        {
+          categories.map((cat) => (
+            <a class="gr-cat-card" href={`${base}/devices/${cat.slug}/`}>
+              <span class="gr-cat-card__icon">
+                <svg viewBox="0 0 24 24" set:html={cat.icon} />
+              </span>
+              <h3>{cat.name}</h3>
+              <span class="gr-cat-card__count">
+                {cat.devices.length} device{cat.devices.length === 1 ? '' : 's'}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="gr-section">
+    <div class="gr-container">
+      <div class="gr-cta">
+        <h2>Run the whole system without hardware</h2>
+        <p>
+          The first vertical slice runs end-to-end on a built-in simulator — see the control loop
+          working before you flash a single ESP32.
+        </p>
+        <div class="gr-cta__actions">
+          <a class="gr-btn gr-btn--primary" href={`${base}/getting-started/`}>Read the quick start</a>
+          <a class="gr-btn gr-btn--ghost" href="https://github.com/growrig" target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .gr-flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    align-items: stretch;
+  }
+  .gr-flow__step {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: var(--gr-bg);
+    border: 1px solid var(--gr-border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    flex: 1 1 190px;
+    max-width: 230px;
+  }
+  .gr-flow__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--gr-accent) 18%, transparent);
+    color: var(--gr-accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .gr-flow__step div {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .gr-flow__step span {
+    color: var(--gr-muted);
+    font-size: 0.85rem;
+  }
+</style>

@@ -16,6 +16,17 @@ export default defineConfig({
         replacesTitle: true,
       },
       favicon: '/favicon.svg',
+      head: [
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon-32.png', sizes: '32x32', type: 'image/png' } },
+        { tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+        { tag: 'link', attrs: { rel: 'manifest', href: '/site.webmanifest' } },
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#34b16a' } },
+      ],
+      components: {
+        // Adds top-level product nav (Getting Started / Documentation /
+        // Supported Devices) to the docs header.
+        SiteTitle: './src/components/starlight/SiteTitle.astro',
+      },
       social: [
         {
           icon: 'github',
@@ -25,26 +36,16 @@ export default defineConfig({
       ],
       lastUpdated: true,
       customCss: ['./src/styles/custom.css'],
+      // Devices live in custom pages under /devices, so no docs entry links
+      // there from the sidebar; the header nav covers it.
       sidebar: [
         {
-          label: 'Start here',
-          items: [
-            { label: 'Overview', slug: 'getting-started' },
-            { label: 'Project documentation', slug: 'project' },
-            { label: 'Supported devices', slug: 'devices' },
-          ],
+          label: 'Getting Started',
+          items: [{ autogenerate: { directory: 'getting-started' } }],
         },
         {
-          label: 'Project',
-          items: [{ autogenerate: { directory: 'project/reference' } }],
-        },
-        {
-          label: 'Device catalog',
-          items: [{ autogenerate: { directory: 'devices/catalog' } }],
-        },
-        {
-          label: 'Contributing',
-          items: [{ autogenerate: { directory: 'contributing' } }],
+          label: 'Documentation',
+          items: [{ autogenerate: { directory: 'documentation' } }],
         },
       ],
     }),

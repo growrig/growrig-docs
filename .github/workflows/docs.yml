@@ -22,18 +22,7 @@ jobs:
       - name: Check out docs
         uses: actions/checkout@v4
 
-      - name: Check out GrowRig project docs
-        uses: actions/checkout@v4
-        with:
-          repository: growrig/growrig
-          path: source/growrig
-          sparse-checkout: |
-            docs
-            ROADMAP.md
-            CONTRIBUTING.md
-            GOVERNANCE.md
-
-      - name: Check out GrowRig Platform
+      - name: Check out GrowRig Platform (device catalog)
         uses: actions/checkout@v4
         with:
           repository: growrig/growrig-platform
@@ -48,12 +37,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Generate reference docs
-        run: npm run generate
-
-      - name: Smoke-test generated docs
-        run: npm run test:generated
 
       - name: Check site
         run: npm run check

@@ -7,16 +7,15 @@
     "node": ">=22"
   },
   "scripts": {
-    "generate": "node scripts/generate.mjs",
-    "dev": "npm run generate && astro dev",
-    "build": "npm run generate && astro build",
+    "dev": "astro dev",
+    "build": "astro build",
     "preview": "astro preview",
-    "check": "npm run generate && astro check",
-    "test:generated": "node scripts/test-generated.mjs"
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.3",
     "astro": "^7.0.7",
+    "marked": "^15.0.12",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

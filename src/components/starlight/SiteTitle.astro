@@ -1,0 +1,73 @@
+---
+// Overrides Starlight's SiteTitle to add product-site nav links beside the
+// logo, so the docs header matches the custom marketing / device pages.
+import Logo from '../Logo.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname;
+
+const links = [
+  { label: 'Getting Started', href: `${base}/getting-started/`, match: `${base}/getting-started` },
+  { label: 'Documentation', href: `${base}/documentation/`, match: `${base}/documentation` },
+  { label: 'Supported Devices', href: `${base}/devices/`, match: `${base}/devices` },
+];
+
+const isActive = (match: string) => path === match || path.startsWith(`${match}/`);
+---
+
+<div class="site-title-wrap">
+  <a href={`${base}/`} class="site-logo" aria-label="GrowRig home">
+    <Logo />
+  </a>
+  <nav class="site-nav">
+    {
+      links.map((link) => (
+        <a href={link.href} class={isActive(link.match) ? 'active' : undefined}>
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+</div>
+
+<style>
+  .site-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+  .site-logo :global(svg) {
+    height: 26px;
+    width: auto;
+    color: var(--sl-color-white);
+  }
+  .site-nav {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .site-nav a {
+    padding: 0.4rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-nav a:hover {
+    color: var(--sl-color-white);
+    background: var(--sl-color-gray-6);
+  }
+  .site-nav a.active {
+    color: var(--sl-color-accent-high);
+  }
+  /* Show inline nav only when there's room; Starlight handles mobile via its
+     own menu, and these sections are reachable from the sidebar too. */
+  @media (min-width: 50rem) {
+    .site-nav {
+      display: flex;
+    }
+  }
+</style>

@@ -1,0 +1,117 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { loadCategories, findCategory } from '../../../lib/devices';
+
+export function getStaticPaths() {
+  return loadCategories().map((cat) => ({ params: { category: cat.slug } }));
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { category } = Astro.params;
+const cat = findCategory(category!)!;
+
+// Unique connection types present in this category, for filter chips.
+const connections = [...new Set(cat.devices.map((d) => d.connectionLabel))].sort();
+---
+
+<SiteLayout
+  title={`${cat.name} — Supported devices — GrowRig`}
+  description={`${cat.devices.length} ${cat.name.toLowerCase()} that work with GrowRig.`}
+>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/devices/`}>Supported devices</a>
+      <span>/</span>
+      <span>{cat.name}</span>
+    </nav>
+    <h1>{cat.name}</h1>
+    <p>{cat.tagline}</p>
+  </div>
+
+  <section class="gr-section" style="padding-top: 1.5rem;">
+    <div class="gr-container">
+      <div class="gr-toolbar">
+        <div class="gr-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+          <input
+            type="search"
+            id="gr-cat-search"
+            placeholder={`Search ${cat.name.toLowerCase()}…`}
+            autocomplete="off"
+            aria-label={`Search ${cat.name}`}
+          />
+        </div>
+        {
+          connections.length > 1 && (
+            <div class="gr-filters" id="gr-cat-filters">
+              <button class="gr-chip is-active" data-connection="all">All</button>
+              {connections.map((conn) => (
+                <button class="gr-chip" data-connection={conn}>
+                  {conn}
+                </button>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="gr-device-grid" id="gr-cat-grid">
+        {
+          cat.devices.map((d) => (
+            <a
+              class="gr-device-card"
+              href={`${base}/devices/${d.category}/${d.slug}/`}
+              data-connection={d.connectionLabel}
+              data-search={`${d.title} ${d.brand} ${d.connectionLabel} ${d.description ?? ''}`.toLowerCase()}
+            >
+              <span class="gr-device-card__logo">{(d.brand || d.title).slice(0, 2).toUpperCase()}</span>
+              <span class="gr-device-card__brand">{d.brand || cat.name}</span>
+              <h3>{d.model || d.title}</h3>
+              {d.description && <p>{d.description}</p>}
+              <span class="gr-tags">
+                <span class="gr-tag">{d.connectionLabel}</span>
+                {d.haIntegration && <span class="gr-tag">{d.haIntegration}</span>}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+      <p class="gr-empty" id="gr-cat-empty" hidden>No devices match.</p>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  const search = document.getElementById('gr-cat-search') as HTMLInputElement | null;
+  const filters = document.getElementById('gr-cat-filters');
+  const grid = document.getElementById('gr-cat-grid');
+  const empty = document.getElementById('gr-cat-empty');
+  const cards = Array.from(grid?.querySelectorAll<HTMLElement>('.gr-device-card') ?? []);
+  let activeConnection = 'all';
+
+  function apply() {
+    const q = (search?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const matchesText = !q || (card.dataset.search ?? '').includes(q);
+      const matchesConn = activeConnection === 'all' || card.dataset.connection === activeConnection;
+      const show = matchesText && matchesConn;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    }
+    if (empty) empty.hidden = visible !== 0;
+  }
+
+  search?.addEventListener('input', apply);
+  filters?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('.gr-chip');
+    if (!btn) return;
+    activeConnection = btn.dataset.connection ?? 'all';
+    filters.querySelectorAll('.gr-chip').forEach((c) => c.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    apply();
+  });
+</script>

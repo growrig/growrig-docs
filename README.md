@@ -1,32 +1,58 @@
-# GrowRig Docs MVP
+# GrowRig website & docs
 
-A working documentation-site starter for the GrowRig ecosystem.
+The public website and documentation for the GrowRig ecosystem, published at
+[growrig.dev](https://growrig.dev/).
 
-It uses Astro Starlight for hand-written documentation and generates reference pages from two authoritative sources:
+It is an [Astro](https://astro.build/) site that combines:
 
-- project documentation from [`growrig/growrig`](https://github.com/growrig/growrig);
-- device definitions from [`growrig/growrig-platform/devices`](https://github.com/growrig/growrig-platform/tree/main/devices).
+- a **custom marketing homepage** and a Home-Assistant-style **Supported Devices**
+  browser (custom Astro pages under `src/pages/`);
+- **Getting Started** and **Documentation** sections built with
+  [Astro Starlight](https://starlight.astro.build/) (hand-authored Markdown under
+  `src/content/docs/`).
 
-## What is included
-
-- GrowRig-themed Starlight landing page and navigation;
-- imported concept, architecture, terminology, prototype, safety, roadmap, and ADR pages;
-- generated device catalog, category indexes, and individual device pages;
-- validation for the current `device.yaml` shape;
-- optional `guide.md` content beside each device definition;
-- GitHub Actions build and GitHub Pages deployment;
-- bundled source snapshots so the MVP can be demonstrated without cloning sibling repositories.
-
-## Recommended repository layout
+## Structure
 
 ```text
-workspace/
-├── growrig/
-├── growrig-platform/
-└── growrig-docs/
+src/
+├── pages/
+│   ├── index.astro                 # Homepage (/)
+│   └── devices/                     # Supported Devices browser
+│       ├── index.astro              #   category grid + global search
+│       └── [category]/
+│           ├── index.astro          #   devices in a category (search + filters)
+│           └── [slug].astro         #   individual device page
+├── content/docs/
+│   ├── getting-started/             # Starlight — Getting Started section
+│   └── documentation/               # Starlight — Documentation section
+├── components/                      # SiteHeader, SiteFooter, Logo, ...
+│   └── starlight/SiteTitle.astro    # header nav override for docs pages
+├── layouts/SiteLayout.astro         # shell for the custom pages
+├── lib/devices.ts                   # reads device.yaml at build time
+└── styles/                          # site.css (custom pages) + custom.css (docs)
 ```
 
-The generators prefer those sibling repositories. If they are not present, they use the bundled `source/` snapshots.
+## Supported devices
+
+Device pages are generated at build time from device definitions in
+[`growrig-platform`](https://github.com/growrig/growrig-platform):
+
+```text
+growrig-platform/devices/<category>/<slug>/device.yaml   (+ optional guide.md)
+```
+
+`src/lib/devices.ts` reads these directly — there is **no separate generate step**.
+It prefers the sibling `../growrig-platform/devices` directory and falls back to the
+bundled snapshot in `source/growrig-platform/devices` (used by CI). Override the
+location with `GROWRIG_DEVICES_DIR`.
+
+To add a device, see
+[Documentation → Adding a device](https://growrig.dev/documentation/adding-a-device/).
+
+## Documentation
+
+The Getting Started and Documentation pages are hand-authored Markdown in this
+repository. Edit the files under `src/content/docs/` directly.
 
 ## Run locally
 
@@ -34,62 +60,18 @@ Requires Node.js 22 or newer.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # start the dev server
+npm run check      # Astro + TypeScript checks
+npm run build      # production build to dist/
+npm run preview    # preview the production build
 ```
 
-Then open the local URL printed by Astro.
-
-Useful commands:
-
-```bash
-npm run generate        # refresh project and device reference pages
-npm run test:generated  # smoke-test generated output
-npm run check           # Astro and TypeScript checks
-npm run build           # production build
-npm run preview         # preview the production build
-```
-
-## Explicit source paths
-
-```bash
-GROWRIG_SOURCE_DIR=/path/to/growrig \
-GROWRIG_DEVICES_DIR=/path/to/growrig-platform/devices \
-npm run dev
-```
-
-Set `SITE_URL` and `BASE_PATH` when publishing somewhere other than `https://growrig.dev/`.
-
-## Device definition workflow
-
-A device is discovered at:
-
-```text
-devices/<category>/<slug>/device.yaml
-```
-
-The path supplies the category and slug. The YAML supplies metadata and capabilities. Add an optional `guide.md` in the same directory for setup instructions, limitations, and troubleshooting.
-
-The generator writes to `src/content/docs/devices/catalog/`. Generated files are ignored by Git because they are recreated during every build.
-
-## Project documentation workflow
-
-Markdown under `growrig/docs/` is copied into `src/content/docs/project/reference/`. The generator also imports selected root files such as `ROADMAP.md`, `CONTRIBUTING.md`, and `GOVERNANCE.md` when present.
-
-Edit those documents in the main GrowRig repository, not in the generated output.
+Set `SITE_URL` and `BASE_PATH` when publishing somewhere other than
+`https://growrig.dev/`.
 
 ## Deployment
 
-The included workflow:
-
-1. checks out this docs repository;
-2. checks out the current `growrig` and `growrig-platform` repositories into `source/`;
-3. installs dependencies;
-4. regenerates all reference pages;
-5. runs the smoke test and Astro checks;
-6. builds and deploys `dist/` to GitHub Pages on pushes to `main` at `https://growrig.dev/`.
-
-The custom domain is configured in GitHub Pages settings and preserved via `public/CNAME`.
-
-## Next useful improvements
-
-The MVP intentionally avoids a complex custom content loader. Later additions can include device images, structured support status, compatibility-test results, schema sharing with Grow Core, rendered Mermaid diagrams, versioned documentation, and localization.
+The GitHub Actions workflow checks out this repo and the `growrig-platform` device
+catalog, installs dependencies, runs `npm run check`, builds the site, and deploys
+`dist/` to GitHub Pages on pushes to `main`. The custom domain is configured via
+`public/CNAME`.
