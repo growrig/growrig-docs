@@ -46,6 +46,9 @@ It prefers the sibling `../growrig-platform/devices` directory and falls back to
 bundled snapshot in `source/growrig-platform/devices` (used by CI). Override the
 location with `GROWRIG_DEVICES_DIR`.
 
+During `npm run dev`, changes under `../growrig-platform/devices` and
+`../growrig-platform/vendors` trigger an automatic reload.
+
 To add a device, see
 [Documentation → Adding a device](https://growrig.dev/documentation/adding-a-device/).
 

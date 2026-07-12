@@ -1,6 +1,8 @@
 ---
 import SiteLayout from '../../../layouts/SiteLayout.astro';
-import { loadCategories, findCategory } from '../../../lib/devices';
+import { loadCategories, findCategory, categoryProductCount } from '../../../lib/devices';
+import { loadVendors } from '../../../lib/vendors';
+import DeviceArtwork from '../../../components/DeviceArtwork.astro';
 
 export function getStaticPaths() {
   return loadCategories().map((cat) => ({ params: { category: cat.slug } }));
@@ -9,14 +11,23 @@ export function getStaticPaths() {
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const { category } = Astro.params;
 const cat = findCategory(category!)!;
+const vendors = new Map(loadVendors().map((vendor) => [vendor.id, vendor]));
 
 // Unique connection types present in this category, for filter chips.
 const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sort();
+const configuredGroups = cat.groups ?? [];
+const groupedKeys = new Set(configuredGroups.map((group) => group.key));
+const groups = configuredGroups.length > 0
+  ? [
+      ...configuredGroups.map((group) => ({ ...group, products: cat.products.filter((product) => product.group === group.key) })),
+      { key: 'other', label: `Other ${cat.name.toLowerCase()}`, products: cat.products.filter((product) => !product.group || !groupedKeys.has(product.group)) },
+    ].filter((group) => group.products.length > 0)
+  : [{ key: 'all', label: '', products: cat.products }];
 ---
 
 <SiteLayout
   title={`${cat.name} — Supported devices — GrowRig`}
-  description={`${cat.products.length} ${cat.name.toLowerCase()} that work with GrowRig.`}
+  description={`${categoryProductCount(cat)} ${cat.name.toLowerCase()} products that work with GrowRig.`}
 >
   <div class="gr-container gr-page-head">
     <nav class="gr-breadcrumb">
@@ -58,26 +69,36 @@ const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sor
         }
       </div>
 
-      <div class="gr-device-grid" id="gr-cat-grid">
-        {
-          cat.products.map((d) => (
+      <div id="gr-cat-groups" class="gr-device-groups">
+        {groups.map((group) => (
+          <section class="gr-device-group" data-device-group={group.key}>
+            {group.label && <h2>{group.label}</h2>}
+            <div class="gr-device-grid">
+              {group.products.map((d) => (
             <a
               class="gr-device-card"
               href={`${base}/devices/${d.category}/${d.slug}/`}
               data-connection={d.connectionLabel}
-              data-search={`${d.title} ${d.brand} ${d.connectionLabel} ${d.description ?? ''}`.toLowerCase()}
+              data-search={`${d.title} ${d.brand} ${d.connectionLabel} ${d.description ?? ''} ${d.models.map((model) => model.model ?? model.id).join(' ')}`.toLowerCase()}
             >
-              {d.image ? <img class="gr-device-card__image" src={d.image} alt="" /> : <span class="gr-device-card__logo">{(d.brand || d.title).slice(0, 2).toUpperCase()}</span>}
+              <DeviceArtwork product={d} vendor={d.vendor ? vendors.get(d.vendor) : undefined} />
               <span class="gr-device-card__brand">{d.brand || cat.name}</span>
               <h3>{d.model || d.title}</h3>
               {d.description && <p>{d.description}</p>}
+              {d.models.length > 0 && (
+                <ul class="gr-device-card__models" aria-label="Models in this series">
+                  {d.models.map((model) => <li>{model.model ?? model.id}</li>)}
+                </ul>
+              )}
               <span class="gr-tags">
                 <span class="gr-tag">{d.connectionLabel}</span>
                 {d.haIntegration && <span class="gr-tag">{d.haIntegration}</span>}
               </span>
             </a>
-          ))
-        }
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
       <p class="gr-empty" id="gr-cat-empty" hidden>No devices match.</p>
     </div>
@@ -87,9 +108,9 @@ const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sor
 <script>
   const search = document.getElementById('gr-cat-search') as HTMLInputElement | null;
   const filters = document.getElementById('gr-cat-filters');
-  const grid = document.getElementById('gr-cat-grid');
+  const groups = Array.from(document.querySelectorAll<HTMLElement>('.gr-device-group'));
   const empty = document.getElementById('gr-cat-empty');
-  const cards = Array.from(grid?.querySelectorAll<HTMLElement>('.gr-device-card') ?? []);
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.gr-device-group .gr-device-card'));
   let activeConnection = 'all';
 
   function apply() {
@@ -102,6 +123,7 @@ const connections = [...new Set(cat.products.map((d) => d.connectionLabel))].sor
       card.style.display = show ? '' : 'none';
       if (show) visible++;
     }
+    for (const group of groups) group.hidden = !Array.from(group.querySelectorAll<HTMLElement>('.gr-device-card')).some((card) => card.style.display !== 'none');
     if (empty) empty.hidden = visible !== 0;
   }
 

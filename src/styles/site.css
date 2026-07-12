@@ -439,6 +439,16 @@ img {
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
+.gr-device-groups { display:flex; flex-direction:column; gap:2rem; }
+.gr-device-group h2 { margin:0 0 1rem; font-size:1.35rem; }
+.gr-device-group[hidden] { display:none; }
+
+/* Author-level grid declarations otherwise override the browser's native
+   [hidden] rule during catalogue search. */
+.gr-cat-grid[hidden],
+.gr-device-grid[hidden] {
+  display: none;
+}
 
 .gr-vendor-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; }
 .gr-vendor-card { display:flex; min-height:130px; flex-direction:column; align-items:center; justify-content:center; gap:.8rem; padding:1.25rem; border:1px solid var(--gr-border); border-radius:14px; background:var(--gr-surface); }
@@ -446,8 +456,18 @@ img {
 .gr-vendor-card img { width:180px; height:60px; object-fit:contain; border-radius:10px; }
 .gr-vendor-card > span:not(.gr-vendor-card__fallback) { color:var(--gr-muted); font-size:.85rem; }
 .gr-vendor-card__fallback { display:flex; width:72px; height:72px; align-items:center; justify-content:center; border-radius:18px; background:var(--vendor-background); color:var(--vendor-color); font-size:1.35rem; font-weight:800; letter-spacing:.04em; }
-.gr-device-card__image { width:100%; aspect-ratio:16/9; object-fit:contain; border-radius:10px; background:var(--gr-surface-2); }
-.gr-device-hero { display:block; width:min(100%,640px); max-height:360px; margin-top:1.5rem; object-fit:contain; border-radius:16px; background:var(--gr-surface); }
+.gr-device-artwork { display:flex; width:100%; aspect-ratio:16/9; align-items:center; justify-content:center; overflow:hidden; border-radius:10px; background:var(--gr-surface-2); }
+.gr-device-artwork__product { width:100%; height:100%; object-fit:contain; }
+.gr-device-artwork__vendor { width:70%; height:58%; object-fit:contain; }
+.gr-device-artwork--fallback { background:var(--gr-surface-2); }
+.gr-device-artwork__fallback { display:flex; width:100%; height:100%; align-items:center; justify-content:center; color:var(--gr-accent); }
+.gr-device-artwork__fallback svg { width:46px; height:46px; }
+.gr-device-artwork--hero { width:min(100%,640px); max-height:360px; margin-top:1.5rem; border-radius:16px; background:var(--gr-surface); }
+.gr-detail__aside .gr-device-artwork { margin-bottom:1rem; }
+.gr-device-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; }
+.gr-device-gallery figure { margin:0; }
+.gr-device-gallery img { width:100%; aspect-ratio:4/3; object-fit:contain; border-radius:10px; background:var(--gr-surface-2); }
+.gr-device-gallery figcaption { margin-top:.35rem; color:var(--gr-muted); font-size:.8rem; }
 
 .gr-device-card {
   display: flex;
@@ -500,6 +520,24 @@ img {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.gr-device-card__models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gr-device-card__models li {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--gr-border);
+  border-radius: 999px;
+  color: var(--gr-muted);
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 .gr-tags {

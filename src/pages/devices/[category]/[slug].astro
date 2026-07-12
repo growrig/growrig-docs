@@ -2,6 +2,8 @@
 import { marked } from 'marked';
 import SiteLayout from '../../../layouts/SiteLayout.astro';
 import { loadCategories, findCategory, SPEC_META } from '../../../lib/devices';
+import { loadVendors } from '../../../lib/vendors';
+import DeviceArtwork from '../../../components/DeviceArtwork.astro';
 
 export function getStaticPaths() {
   return loadCategories().flatMap((cat) =>
@@ -13,6 +15,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const { category, slug } = Astro.params;
 const cat = findCategory(category!)!;
 const device = cat.products.find((d) => d.slug === slug)!;
+const vendor = device.vendor ? loadVendors().find((entry) => entry.id === device.vendor) : undefined;
+const gallery = [
+  ...device.images.map((image) => ({
+    src: image.src,
+    label: image.model ? (device.models.find((model) => model.id === image.model)?.model ?? image.model) : device.model,
+  })),
+].filter((entry, index, entries) => entries.findIndex((candidate) => candidate.src === entry.src) === index);
 
 const description = device.description ?? `${device.title} device profile for GrowRig.`;
 const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/devices/${category}/${device.driverSlug}/device.yaml`;
@@ -30,6 +39,11 @@ const specRows = Object.entries(device.specs ?? {}).map(([key, value]) => {
   const label = meta?.label ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
   return { label, value: meta?.unit ? `${value} ${meta.unit}` : String(value) };
 });
+const modelSpecs = (specs: Record<string, number> | undefined) => Object.entries(specs ?? {}).map(([key, value]) => {
+  const meta = SPEC_META[key];
+  const label = meta?.label ?? key.replace(/([A-Z])/g, ' $1').toLowerCase();
+  return `${label}: ${value}${meta?.unit ? ` ${meta.unit}` : ''}`;
+}).join(' · ');
 
 // Derive tent air volume when full dimensions are present.
 const s = device.specs ?? {};
@@ -60,11 +74,30 @@ if (device.author) meta.push(['Maintainer', device.author]);
     </nav>
     <h1>{device.title}</h1>
     <p>{description}</p>
-    {device.image && <img class="gr-device-hero" src={device.image} alt={device.title} />}
+    {(device.image || vendor?.logo) && <DeviceArtwork product={device} {vendor} hero />}
   </div>
 
   <div class="gr-container gr-detail">
     <div class="gr-prose">
+      {device.models.length > 0 && (
+        <>
+          <h2>Models in this series</h2>
+          <div class="gr-table-wrap">
+            <table class="gr-table">
+              <thead><tr><th>Model</th><th>Specifications</th></tr></thead>
+              <tbody>{device.models.map((model) => <tr><td>{model.model ?? model.id}</td><td>{modelSpecs(model.specs) || '—'}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </>
+      )}
+      {gallery.length > 1 && (
+        <>
+          <h2>Gallery</h2>
+          <div class="gr-device-gallery">
+            {gallery.map((entry) => <figure><img src={entry.src} alt={entry.label} loading="lazy" /><figcaption>{entry.label}</figcaption></figure>)}
+          </div>
+        </>
+      )}
       {
         specRows.length > 0 && (
           <>
@@ -149,9 +182,7 @@ if (device.author) meta.push(['Maintainer', device.author]);
     </div>
 
     <aside class="gr-detail__aside">
-      <span class="gr-device-card__logo" style="margin-bottom:1rem;">
-        {(device.brand || device.title).slice(0, 2).toUpperCase()}
-      </span>
+      {(device.image || vendor?.logo) && <DeviceArtwork product={device} {vendor} />}
       <dl style="margin:0;">
         {
           meta.map(([label, value]) => (

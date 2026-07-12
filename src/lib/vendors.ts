@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { allProducts } from './devices';
+import { allProducts, productCount } from './devices';
 
 export interface Vendor {
   id: string;
@@ -22,7 +22,7 @@ function root(): string {
 
 export function loadVendors(): Vendor[] {
   const counts = new Map<string, number>();
-  for (const product of allProducts()) if (product.vendor) counts.set(product.vendor, (counts.get(product.vendor) ?? 0) + 1);
+  for (const product of allProducts()) if (product.vendor) counts.set(product.vendor, (counts.get(product.vendor) ?? 0) + productCount(product));
   return readdirSync(root(), { withFileTypes: true }).filter((entry) => entry.isDirectory()).flatMap((entry) => {
     const dir = path.join(root(), entry.name);
     const metadata = path.join(dir, 'vendor.yaml');

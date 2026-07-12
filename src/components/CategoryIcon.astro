@@ -1,0 +1,17 @@
+---
+import { Box, Camera, Cpu, Cuboid, Fan, Lightbulb, Plug, Thermometer } from '@lucide/astro';
+
+interface Props { category: string; size?: number; strokeWidth?: number }
+const { category, size = 24, strokeWidth = 1.7 } = Astro.props;
+const icons = {
+  controller: Cpu,
+  sensor: Thermometer,
+  fan: Fan,
+  light: Lightbulb,
+  plug: Plug,
+  camera: Camera,
+  tent: Cuboid,
+} as const;
+const Icon = icons[category as keyof typeof icons] ?? Box;
+---
+<Icon {size} stroke-width={strokeWidth} aria-hidden="true" />

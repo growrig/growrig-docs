@@ -1,10 +1,11 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { loadCategories, allProducts } from '../lib/devices';
+import { loadCategories, categoryProductCount, totalProductCount } from '../lib/devices';
+import CategoryIcon from '../components/CategoryIcon.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const categories = loadCategories();
-const deviceCount = allProducts().length;
+const deviceCount = totalProductCount();
 
 const features = [
   {
@@ -119,11 +120,11 @@ const flow = [
           categories.map((cat) => (
             <a class="gr-cat-card" href={`${base}/devices/${cat.slug}/`}>
               <span class="gr-cat-card__icon">
-                <svg viewBox="0 0 24 24" set:html={cat.icon} />
+                <CategoryIcon category={cat.slug} />
               </span>
               <h3>{cat.name}</h3>
               <span class="gr-cat-card__count">
-                {cat.products.length} device{cat.products.length === 1 ? '' : 's'}
+                {categoryProductCount(cat)} product{categoryProductCount(cat) === 1 ? '' : 's'}
               </span>
             </a>
           ))

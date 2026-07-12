@@ -1,12 +1,23 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { growrigPlatformSync } from './scripts/vite-growrig-platform.mjs';
+import { resolvePlatformRoot } from './scripts/lib/platform-paths.mjs';
 
 const site = process.env.SITE_URL ?? 'https://growrig.dev';
 const base = process.env.BASE_PATH ?? '/';
+const platformRoot = resolvePlatformRoot();
 
 export default defineConfig({
   site,
   base,
+  vite: {
+    plugins: [growrigPlatformSync()],
+    server: {
+      fs: {
+        allow: platformRoot ? [process.cwd(), platformRoot] : undefined,
+      },
+    },
+  },
   integrations: [
     starlight({
       title: 'GrowRig',

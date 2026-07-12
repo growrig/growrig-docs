@@ -35,20 +35,21 @@ export interface Capability {
 }
 
 /**
- * A concrete supported product, flattened from a driver's `products` list (or
- * the driver itself when it lists none). Driver-level fields (capabilities, HA
- * integration, connection) are inherited so a product page is self-contained.
+ * A supported product series. Exact models remain available in `models`.
  */
 export interface Product {
   category: string;
   slug: string; // unique within its category
   brand: string;
   vendor?: string;
+  group?: string;
   model: string;
   title: string;
   description?: string;
   image?: string;
+  images: ProductImage[];
   specs?: Record<string, number>;
+  models: Variant[];
   // Inherited from the backing driver:
   connection: string;
   connectionLabel: string;
@@ -61,6 +62,7 @@ export interface Product {
   driverSlug: string;
   driverBrand: string;
   driverModel: string;
+  fanType?: string;
   /** True when this product is one of several under a generic backing driver. */
   viaDriver: boolean;
 }
@@ -71,6 +73,7 @@ export interface CategoryMeta {
   tagline: string;
   icon: string;
   order: number;
+  groups?: { key: string; label: string }[];
 }
 
 export interface CategoryWithProducts extends CategoryMeta {
@@ -99,6 +102,10 @@ export const SPEC_META: Record<string, { label: string; unit?: string }> = {
   depthCm: { label: 'Depth', unit: 'cm' },
   heightCm: { label: 'Height', unit: 'cm' },
   wattage: { label: 'Rated power', unit: 'W' },
+  coverageWidthFt: { label: 'Coverage width', unit: 'ft' },
+  coverageDepthFt: { label: 'Coverage depth', unit: 'ft' },
+  coverageWidthCm: { label: 'Coverage width', unit: 'cm' },
+  coverageDepthCm: { label: 'Coverage depth', unit: 'cm' },
 };
 
 const CATEGORIES: Record<string, Omit<CategoryMeta, 'slug'>> = {
@@ -119,6 +126,10 @@ const CATEGORIES: Record<string, Omit<CategoryMeta, 'slug'>> = {
     tagline: 'Exhaust, intake, and circulation airflow.',
     order: 3,
     icon: '<circle cx="12" cy="12" r="2"/><path d="M12 10c0-3 1-6-1-8 4 0 6 3 6 6a4 4 0 0 1-5 2M14 12c3 0 6-1 8 1 0 4-3 6-6 6a4 4 0 0 1-2-5M10 14c0 3-1 6 1 8-4 0-6-3-6-6a4 4 0 0 1 5-2"/>',
+    groups: [
+      { key: 'inline', label: 'Inline fans' },
+      { key: 'pwm-pc', label: 'PWM / PC fans' },
+    ],
   },
   light: {
     name: 'Lights',
@@ -142,7 +153,7 @@ const CATEGORIES: Record<string, Omit<CategoryMeta, 'slug'>> = {
     name: 'Grow tents',
     tagline: 'Reference enclosures and their dimensions.',
     order: 7,
-    icon: '<path d="M3 21V6l9-3 9 3v15M3 21h18M12 3v18M7 21v-6l5-2 5 2v6"/>',
+    icon: '<path d="M10 22v-8"/><path d="M2.336 8.89 10 14l11.715-7.029"/><path d="M22 14a2 2 0 0 1-.971 1.715l-10 6a2 2 0 0 1-2.138-.05l-6-4A2 2 0 0 1 2 16v-6a2 2 0 0 1 .971-1.715l10-6a2 2 0 0 1 2.138.05l6 4A2 2 0 0 1 22 8z"/>',
   },
 };
 
@@ -156,21 +167,28 @@ function categoryMeta(slug: string): CategoryMeta {
   return { slug, ...meta };
 }
 
-interface Variant {
+export interface Variant {
   id: string;
   brand?: string;
   vendor?: string;
+  group?: string;
   model?: string;
   description?: string;
-  image?: string;
+  images?: ProductImage[];
   specs?: Record<string, number>;
+  models?: Variant[];
+}
+
+export interface ProductImage {
+  src: string;
+  model?: string;
 }
 
 let cache: CategoryWithProducts[] | null = null;
 
-/** Read every driver `device.yaml`, flatten to products, grouped by category. */
+/** Read every driver `device.yaml`, grouping exact models into product series. */
 export function loadCategories(): CategoryWithProducts[] {
-  if (cache) return cache;
+  if (!import.meta.env.DEV && cache) return cache;
 
   const devicesRoot = resolveDevicesRoot();
   const categories: CategoryWithProducts[] = [];
@@ -207,6 +225,7 @@ export function loadCategories(): CategoryWithProducts[] {
         driverSlug,
         driverBrand,
         driverModel,
+        fanType: data.fanType as string | undefined,
       };
 
       const imageData = (filename?: string): string | undefined => {
@@ -217,23 +236,51 @@ export function loadCategories(): CategoryWithProducts[] {
         const mime = ext === '.svg' ? 'image/svg+xml' : ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : undefined;
         return mime ? `data:${mime};base64,${readFileSync(imagePath).toString('base64')}` : undefined;
       };
+      const imageList = (entries: unknown): ProductImage[] => (Array.isArray(entries) ? entries : []).flatMap((entry) => {
+        const value = typeof entry === 'string' ? { src: entry } : entry as { src?: string; model?: string };
+        const src = imageData(value.src);
+        return src ? [{ src, model: value.model }] : [];
+      });
 
       const variants: Variant[] = Array.isArray(data.products) ? data.products : [];
       if (variants.length > 0) {
-        for (const v of variants) {
-          const brand = (v.brand ?? driverBrand).trim();
-          const model = (v.model ?? driverModel).trim();
+        for (const item of variants) {
+          const models = item.models ?? [];
+          const images = imageList(item.images);
+          const representative = images[0]?.src;
+          const brand = (item.brand ?? driverBrand).trim();
+          const model = (item.model ?? driverModel).trim();
           products.push({
             ...shared,
-            slug: v.id,
+            slug: item.id,
             brand,
-            vendor: v.vendor ?? data.vendor,
+            vendor: item.vendor ?? data.vendor,
+            group: item.group ?? data.group,
             model,
-            image: imageData(v.image ?? data.image),
+            image: representative,
+            images,
             title: `${brand} ${model}`.trim(),
-            description: v.description?.trim() || data.description?.trim() || undefined,
-            specs: v.specs,
+            description: item.description?.trim() || data.description?.trim() || undefined,
+            specs: item.specs,
+            models,
             viaDriver: true,
+          });
+        }
+        if (driverBrand.toLowerCase() === 'generic') {
+          products.push({
+            ...shared,
+            slug: driverSlug,
+            brand: driverBrand,
+            vendor: data.vendor,
+            group: data.group,
+            model: driverModel,
+            image: undefined,
+            images: [],
+            title: `${driverBrand} ${driverModel}`.trim(),
+            description: data.description?.trim() || undefined,
+            specs: undefined,
+            models: [],
+            viaDriver: false,
           });
         }
       } else {
@@ -242,11 +289,14 @@ export function loadCategories(): CategoryWithProducts[] {
           slug: driverSlug,
           brand: driverBrand,
           vendor: data.vendor,
+          group: data.group,
           model: driverModel,
-          image: imageData(data.image),
+          image: undefined,
+          images: [],
           title: `${driverBrand} ${driverModel}`.trim(),
           description: data.description?.trim() || undefined,
           specs: undefined,
+          models: [],
           viaDriver: false,
         });
       }
@@ -258,12 +308,25 @@ export function loadCategories(): CategoryWithProducts[] {
   }
 
   categories.sort((a, b) => a.order - b.order);
-  cache = categories;
+  if (!import.meta.env.DEV) cache = categories;
   return categories;
 }
 
 export function allProducts(): Product[] {
   return loadCategories().flatMap((c) => c.products);
+}
+
+/** Number of real selectable products represented by a card/series. */
+export function productCount(product: Product): number {
+  return product.models.length || 1;
+}
+
+export function categoryProductCount(category: CategoryWithProducts): number {
+  return category.products.reduce((total, product) => total + productCount(product), 0);
+}
+
+export function totalProductCount(): number {
+  return loadCategories().reduce((total, category) => total + categoryProductCount(category), 0);
 }
 
 export function findCategory(slug: string): CategoryWithProducts | undefined {

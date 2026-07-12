@@ -1,0 +1,20 @@
+---
+import type { Product } from '../lib/devices';
+import type { Vendor } from '../lib/vendors';
+import CategoryIcon from './CategoryIcon.astro';
+
+interface Props { product: Product; vendor?: Vendor; hero?: boolean }
+const { product, vendor, hero = false } = Astro.props;
+const fallback = !product.image && !vendor?.logo;
+---
+<div class:list={['gr-device-artwork', { 'gr-device-artwork--hero': hero, 'gr-device-artwork--fallback': fallback }]}>
+  {product.image ? (
+    <img class="gr-device-artwork__product" src={product.image} alt={product.title} />
+  ) : vendor?.logo ? (
+    <img class="gr-device-artwork__vendor" src={vendor.logo} alt={`${vendor.name} logo`} />
+  ) : (
+    <span class="gr-device-artwork__fallback" aria-label={`${product.category} category`}>
+      <CategoryIcon category={product.category} size={38} />
+    </span>
+  )}
+</div>

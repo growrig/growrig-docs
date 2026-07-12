@@ -33,12 +33,14 @@ model: Grow tent
 connection: n/a
 description: A passive enclosure recorded for its air volume.
 products:
-  - id: mars-hydro-2x2
+  - id: mars-hydro-grow-tent-series
     vendor: mars-hydro
     brand: Mars Hydro
-    model: 2'×2' Grow Tent
-    image: mars-hydro-2x2.webp
-    specs: { widthCm: 60, depthCm: 60, heightCm: 140 }
+    model: Grow Tent Series
+    models:
+      - id: mars-hydro-2x2
+        model: 2'×2' Grow Tent
+        specs: { widthCm: 60, depthCm: 60, heightCm: 140 }
   - id: vivosun-4x4
     brand: VIVOSUN
     model: 4'×4' Grow Tent
@@ -49,6 +51,9 @@ products:
 
 Each entry under `products:` needs a unique `id` (unique within its category) and
 usually a `brand` and `model`; it inherits the driver's brand/model when omitted.
+An entry may be a simple product, or a series containing exact `models`. Series
+metadata is written once; Grow Core flattens its models for exact selection while
+the public catalogue shows one series card.
 
 `specs` is a **free-form numeric map** — the key idea that makes this systematic.
 Grow Core reads well-known keys where it needs them (fans use `sizeMm`, `maxRpm`,
@@ -56,8 +61,12 @@ Grow Core reads well-known keys where it needs them (fans use `sizeMm`, `maxRpm`
 `noiseDba`; tents use `widthCm`, `depthCm`, `heightCm`); every other key is shown
 as display metadata. Add keys freely — no schema change required.
 
-A driver with **no** `products:` is itself a single product (e.g. the Tapo P110
-smart plug), so simple one-off devices stay a one-file definition.
+A driver with **no** `products:` is itself a single product, so simple one-off
+devices stay a one-file definition.
+
+A driver whose brand is `Generic` always remains visible as a generic catalogue
+option, even when it also lists branded products or series. Do not duplicate it
+inside `products`; the catalogue loader adds it automatically.
 
 ### Vendor and product artwork
 
@@ -69,9 +78,10 @@ Until a logo is provided, `color` and `background` in `vendor.yaml` render a
 branded initials fallback. Add `logo: filename.svg` (PNG, JPEG, and WebP also
 work) after placing the real artwork beside `vendor.yaml`.
 
-Set the optional `image` field on a driver or product to an SVG, PNG, JPEG, or
-WebP file beside `device.yaml`. Variant images override the driver image; a
-driver image is inherited by all variants that do not specify their own.
+Use `products[].images` when a product or series has multiple pictures. Each
+entry has `src` and may have a `model` id associating it with an exact model.
+Images without `model` apply to the whole series. The first image represents the
+series on catalogue cards, and the complete set appears in the profile gallery.
 
 ### Capabilities
 

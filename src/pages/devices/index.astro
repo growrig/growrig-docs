@@ -1,11 +1,14 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { loadCategories, allProducts } from '../../lib/devices';
+import { loadCategories, allProducts, categoryProductCount, totalProductCount } from '../../lib/devices';
+import { loadVendors } from '../../lib/vendors';
+import CategoryIcon from '../../components/CategoryIcon.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const categories = loadCategories();
 const products = allProducts();
-const total = products.length;
+const total = totalProductCount();
+const vendors = new Map(loadVendors().map((vendor) => [vendor.id, vendor]));
 
 // Lightweight data for client-side search.
 const searchData = products.map((d) => ({
@@ -15,8 +18,12 @@ const searchData = products.map((d) => ({
   categoryName: categories.find((c) => c.slug === d.category)?.name ?? d.category,
   connection: d.connectionLabel,
   description: d.description ?? '',
+  models: d.models.map((model) => model.model ?? model.id),
   href: `${base}/devices/${d.category}/${d.slug}/`,
   initials: (d.brand || d.title).slice(0, 2).toUpperCase(),
+  image: d.image,
+  vendorLogo: d.vendor ? vendors.get(d.vendor)?.logo : undefined,
+  categoryIcon: categories.find((c) => c.slug === d.category)?.icon ?? '<rect x="4" y="4" width="16" height="16" rx="2"/>',
 }));
 ---
 
@@ -28,7 +35,7 @@ const searchData = products.map((d) => ({
     <h1>Supported devices</h1>
     <p>
       Devices and equipment that work with GrowRig, grouped by what they do. Pick a category to see
-      every profile, or search across all {total} definitions.
+      every profile, or search across all {total} supported products.
     </p>
   </div>
 
@@ -56,12 +63,12 @@ const searchData = products.map((d) => ({
           categories.map((cat) => (
             <a class="gr-cat-card" href={`${base}/devices/${cat.slug}/`}>
               <span class="gr-cat-card__icon">
-                <svg viewBox="0 0 24 24" set:html={cat.icon} />
+                <CategoryIcon category={cat.slug} />
               </span>
               <h3>{cat.name}</h3>
               <p>{cat.tagline}</p>
               <span class="gr-cat-card__count">
-                {cat.products.length} device{cat.products.length === 1 ? '' : 's'}
+                {categoryProductCount(cat)} product{categoryProductCount(cat) === 1 ? '' : 's'}
               </span>
             </a>
           ))
@@ -82,12 +89,19 @@ const searchData = products.map((d) => ({
   const empty = document.getElementById('gr-search-empty');
 
   function card(d) {
+    const artwork = d.image
+      ? `<img class="gr-device-artwork__product" src="${d.image}" alt="${d.title}">`
+      : d.vendorLogo
+        ? `<img class="gr-device-artwork__vendor" src="${d.vendorLogo}" alt="${d.brand} logo">`
+        : `<span class="gr-device-artwork__fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d.categoryIcon}</svg></span>`;
+    const fallbackClass = !d.image && !d.vendorLogo ? ' gr-device-artwork--fallback' : '';
     return `
       <a class="gr-device-card" href="${d.href}">
-        <span class="gr-device-card__logo">${d.initials}</span>
+        <div class="gr-device-artwork${fallbackClass}">${artwork}</div>
         <span class="gr-device-card__brand">${d.brand || d.categoryName}</span>
         <h3>${d.title}</h3>
         ${d.description ? `<p>${d.description}</p>` : ''}
+        ${d.models.length ? `<ul class="gr-device-card__models" aria-label="Models in this series">${d.models.map((model) => `<li>${model}</li>`).join('')}</ul>` : ''}
         <span class="gr-tags"><span class="gr-tag">${d.categoryName}</span><span class="gr-tag">${d.connection}</span></span>
       </a>`;
   }
@@ -102,7 +116,7 @@ const searchData = products.map((d) => ({
       return;
     }
     const matches = searchData.filter((d) =>
-      [d.title, d.brand, d.categoryName, d.connection, d.description]
+      [d.title, d.brand, d.categoryName, d.connection, d.description, ...d.models]
         .join(' ')
         .toLowerCase()
         .includes(q),
