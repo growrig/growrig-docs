@@ -74,7 +74,7 @@ Set `SITE_URL` and `BASE_PATH` when publishing somewhere other than
 
 ## Deployment
 
-The GitHub Actions workflow checks out this repo and the `growrig-platform` device
-catalog, installs dependencies, runs `npm run check`, builds the site, and deploys
-`dist/` to GitHub Pages on pushes to `main`. The custom domain is configured via
-`public/CNAME`.
+The GitHub Actions workflow checks out this repo and the `growrig-platform`
+`devices/` and `vendors/` catalogs, installs dependencies, runs `npm run check`,
+builds the site, and deploys `dist/` to GitHub Pages on pushes to `main`. The custom
+domain is configured via `public/CNAME`.

@@ -29,6 +29,7 @@ jobs:
           path: source/growrig-platform
           sparse-checkout: |
             devices
+            vendors
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
