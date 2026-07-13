@@ -1,0 +1,129 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import {
+  loadProductCategories,
+  allInventoryProducts,
+  categoryProductCount,
+  totalProductCount,
+} from '../../lib/inventory';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const categories = loadProductCategories();
+const products = allInventoryProducts();
+const total = totalProductCount();
+
+// Lightweight data for client-side search.
+const searchData = products.map((p) => ({
+  name: p.name,
+  brand: p.brand ?? '',
+  category: p.category,
+  categoryLabel: categories.find((c) => c.slug === p.category)?.label ?? p.category,
+  categoryIcon: categories.find((c) => c.slug === p.category)?.icon ?? 'box',
+  description: p.description ?? '',
+  attributes: Object.values(p.attributes),
+  variants: p.variants.map((variant) => variant.size),
+  href: `${base}/products/${p.category}/${p.slug}/`,
+  image: p.image,
+}));
+---
+
+<SiteLayout
+  title="Supported products — GrowRig"
+  description="Built-in product templates GrowRig ships for its inventory — nutrients, media, supplies and more."
+>
+  <div class="gr-container gr-page-head">
+    <h1>Supported products</h1>
+    <p>
+      Ready-made product templates GrowRig ships for the inventory. Picking one pre-fills an item's
+      name, size and details and binds it to the definition. Browse a category, or search across
+      all {total} pack sizes.
+    </p>
+  </div>
+
+  <section class="gr-section" style="padding-top: 1.5rem;">
+    <div class="gr-container">
+      <div class="gr-toolbar">
+        <div class="gr-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+          <input
+            type="search"
+            id="gr-product-search"
+            placeholder="Search all supported products…"
+            autocomplete="off"
+            aria-label="Search supported products"
+          />
+        </div>
+      </div>
+
+      <!-- Category grid (default view) -->
+      <div class="gr-cat-grid" id="gr-cats">
+        {
+          categories.map((cat) => (
+            <a class="gr-cat-card" href={`${base}/products/${cat.slug}/`}>
+              <span class="gr-cat-card__icon">
+                <LucideIcon name={cat.icon} />
+              </span>
+              <h3>{cat.label}</h3>
+              <p>{cat.description}</p>
+              <span class="gr-cat-card__count">
+                {categoryProductCount(cat)} product{categoryProductCount(cat) === 1 ? '' : 's'}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Search results (hidden until searching) -->
+      <div class="gr-device-grid" id="gr-search-results" hidden></div>
+      <p class="gr-empty" id="gr-search-empty" hidden>No products match your search.</p>
+    </div>
+  </section>
+</SiteLayout>
+
+<script define:vars={{ searchData }}>
+  const input = document.getElementById('gr-product-search');
+  const cats = document.getElementById('gr-cats');
+  const results = document.getElementById('gr-search-results');
+  const empty = document.getElementById('gr-search-empty');
+
+  function card(p) {
+    const artwork = p.image
+      ? `<img class="gr-device-artwork__product" src="${p.image}" alt="${p.name}">`
+      : `<span class="gr-device-artwork__fallback">${p.categoryLabel}</span>`;
+    const fallbackClass = p.image ? '' : ' gr-device-artwork--fallback';
+    return `
+      <a class="gr-device-card" href="${p.href}">
+        <div class="gr-device-artwork${fallbackClass}">${artwork}</div>
+        <span class="gr-device-card__brand">${p.brand || p.categoryLabel}</span>
+        <h3>${p.name}</h3>
+        ${p.description ? `<p>${p.description}</p>` : ''}
+        ${p.variants.length ? `<ul class="gr-device-card__models" aria-label="Pack sizes">${p.variants.map((size) => `<li>${size}</li>`).join('')}</ul>` : ''}
+        <span class="gr-tags"><span class="gr-tag">${p.categoryLabel}</span></span>
+      </a>`;
+  }
+
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) {
+      cats.hidden = false;
+      results.hidden = true;
+      empty.hidden = true;
+      results.innerHTML = '';
+      return;
+    }
+    const matches = searchData.filter((p) =>
+      [p.name, p.brand, p.categoryLabel, p.description, ...p.attributes, ...p.variants]
+        .join(' ')
+        .toLowerCase()
+        .includes(q),
+    );
+    cats.hidden = true;
+    results.innerHTML = matches.map(card).join('');
+    results.hidden = matches.length === 0;
+    empty.hidden = matches.length !== 0;
+  });
+</script>

@@ -1,11 +1,15 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { loadCategories, categoryProductCount, totalProductCount } from '../lib/devices';
+import { totalProductCount as totalInventoryCount } from '../lib/inventory';
+import { totalIntegrationCount } from '../lib/integrations';
 import CategoryIcon from '../components/CategoryIcon.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const categories = loadCategories();
 const deviceCount = totalProductCount();
+const inventoryCount = totalInventoryCount();
+const integrationCount = totalIntegrationCount();
 
 const features = [
   {
@@ -129,6 +133,32 @@ const flow = [
             </a>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- Products & integrations teaser -->
+  <section class="gr-section" style="background: var(--gr-surface); border-block: 1px solid var(--gr-border);">
+    <div class="gr-container">
+      <div class="gr-section__head">
+        <h2>Beyond the hardware</h2>
+        <p>GrowRig also ships a stocked inventory catalog and connects to outside services.</p>
+      </div>
+      <div class="gr-grid">
+        <a class="gr-card" href={`${base}/products/`}>
+          <span class="gr-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31M14 9.3V2M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0M5.52 16h12.96"/></svg>
+          </span>
+          <h3>Supported products</h3>
+          <p>{inventoryCount} ready-made inventory templates — nutrients, media and supplies — that pre-fill an item and stay bound to their definition.</p>
+        </a>
+        <a class="gr-card" href={`${base}/integrations/`}>
+          <span class="gr-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0V8ZM12 17v5"/></svg>
+          </span>
+          <h3>Supported integrations</h3>
+          <p>{integrationCount} external-service bundles — AI providers, weather data and notifications — configured as encrypted instances.</p>
+        </a>
       </div>
     </div>
   </section>

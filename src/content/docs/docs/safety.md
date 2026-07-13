@@ -2,7 +2,7 @@
 title: Safety & security
 description: The layered responsibilities that keep physical grow equipment safe.
 sidebar:
-  order: 8
+  order: 14
 ---
 
 GrowRig controls physical equipment, so safety and security are architectural

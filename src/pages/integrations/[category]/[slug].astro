@@ -1,0 +1,127 @@
+---
+import { marked } from 'marked';
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import LucideIcon from '../../../components/LucideIcon.astro';
+import { loadIntegrationCategories, findIntegrationCategory, capabilityLabel } from '../../../lib/integrations';
+
+export function getStaticPaths() {
+  return loadIntegrationCategories().flatMap((cat) =>
+    cat.integrations.map((i) => ({ params: { category: cat.slug, slug: i.slug } })),
+  );
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { category, slug } = Astro.params;
+const cat = findIntegrationCategory(category!)!;
+const integration = cat.integrations.find((i) => i.slug === slug)!;
+
+const description = integration.description ?? `${integration.name} integration for GrowRig.`;
+const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/integrations/${category}/${integration.slug}/integration.yaml`;
+
+// Render the README, dropping its leading H1 (shown as the page title).
+let readmeHtml = '';
+if (integration.readme) {
+  const withoutTitle = integration.readme.replace(/^#\s+.*\n+/, '');
+  readmeHtml = await marked.parse(withoutTitle);
+}
+
+const meta: Array<[string, string]> = [
+  ['Category', cat.name],
+  ['Runtime', integration.runtimeType],
+  ['Integration id', integration.id],
+];
+if (integration.version) meta.push(['Version', `v${integration.version}`]);
+---
+
+<SiteLayout title={`${integration.name} — GrowRig`} description={description}>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/integrations/`}>Supported integrations</a>
+      <span>/</span>
+      <a href={`${base}/integrations/${category}/`}>{cat.name}</a>
+      <span>/</span>
+      <span>{integration.name}</span>
+    </nav>
+    <h1>{integration.name}</h1>
+    <p>{description}</p>
+  </div>
+
+  <div class="gr-container gr-detail">
+    <div class="gr-prose">
+      <h2>Capabilities</h2>
+      {integration.capabilities.length > 0 ? (
+        <div class="gr-table-wrap">
+          <table class="gr-table">
+            <thead><tr><th>Capability</th><th>Identifier</th></tr></thead>
+            <tbody>
+              {integration.capabilities.map((c) => (
+                <tr><td>{capabilityLabel(c)}</td><td><code>{c}</code></td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>No capabilities are declared for this integration yet.</p>
+      )}
+
+      {integration.config.length > 0 && (
+        <>
+          <h2>Configuration</h2>
+          <div class="gr-table-wrap">
+            <table class="gr-table">
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                {integration.config.map((field) => (
+                  <tr>
+                    <td>{field.label} {field.secret && <span class="gr-tag">secret</span>}</td>
+                    <td><code>{field.type}</code></td>
+                    <td>{field.required ? 'Yes' : 'No'}</td>
+                    <td>{field.help ?? (field.default ? `Default: ${field.default}` : '—')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {readmeHtml && (
+        <>
+          <h2>About</h2>
+          <div class="gr-guide" set:html={readmeHtml} />
+        </>
+      )}
+
+      <p style="margin-top:2rem; color: var(--gr-muted); font-size:0.9rem;">
+        Integrations are configured as instances under <strong>Control panel → Integrations</strong>.
+        Secret fields are AES-GCM encrypted with a local key beside the Grow Core database and are
+        never returned by the API.
+      </p>
+    </div>
+
+    <aside class="gr-detail__aside">
+      <div class:list={['gr-device-artwork', { 'gr-device-artwork--fallback': !integration.icon }]}>
+        {integration.icon ? (
+          <img class="gr-device-artwork__vendor" src={integration.icon} alt={`${integration.name} icon`} />
+        ) : (
+          <span class="gr-device-artwork__fallback">
+            <LucideIcon name={cat.icon} size={38} />
+          </span>
+        )}
+      </div>
+      <dl style="margin:0;">
+        {meta.map(([label, value]) => (
+          <div class="gr-meta-row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <a class="gr-btn gr-btn--ghost" href={definitionUrl} target="_blank" rel="noopener" style="width:100%; justify-content:center; margin-top:1.25rem;">
+        View integration definition ↗
+      </a>
+    </aside>
+  </div>
+</SiteLayout>

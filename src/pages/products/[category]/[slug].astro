@@ -1,0 +1,114 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import LucideIcon from '../../../components/LucideIcon.astro';
+import { loadProductCategories, findProductCategory, attributeLabel } from '../../../lib/inventory';
+
+export function getStaticPaths() {
+  return loadProductCategories().flatMap((cat) =>
+    cat.products.map((p) => ({ params: { category: cat.slug, slug: p.slug } })),
+  );
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { category, slug } = Astro.params;
+const cat = findProductCategory(category!)!;
+const product = cat.products.find((p) => p.slug === slug)!;
+
+const description = product.description ?? `${product.name} product template for GrowRig.`;
+const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/inventory/${category}/products.yaml`;
+
+// Turn attributes into labelled rows using the category's column definitions.
+const columnByKey = new Map(cat.columns.map((column) => [column.key, column]));
+const attributeRows = Object.entries(product.attributes).map(([key, value]) => {
+  const column = columnByKey.get(key);
+  const label = column?.label ?? attributeLabel(key);
+  const isEnum = column?.type === 'enum';
+  return { label, value: isEnum ? attributeLabel(value) : value };
+});
+
+const meta: Array<[string, string]> = [['Category', cat.label]];
+if (product.brand) meta.push(['Brand', product.brand]);
+meta.push(['Pack sizes', String(product.variants.length || 1)]);
+meta.push(['Product id', product.slug]);
+---
+
+<SiteLayout title={`${product.name} — GrowRig`} description={description}>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/products/`}>Supported products</a>
+      <span>/</span>
+      <a href={`${base}/products/${category}/`}>{cat.label}</a>
+      <span>/</span>
+      <span>{product.name}</span>
+    </nav>
+    <h1>{product.name}</h1>
+    <p>{description}</p>
+  </div>
+
+  <div class="gr-container gr-detail">
+    <div class="gr-prose">
+      {product.variants.length > 0 && (
+        <>
+          <h2>Pack sizes</h2>
+          <div class="gr-table-wrap">
+            <table class="gr-table">
+              <thead><tr><th>Size</th><th>SKU / code</th></tr></thead>
+              <tbody>
+                {product.variants.map((variant) => (
+                  <tr><td>{variant.size}</td><td>{variant.code ?? '—'}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      <h2>Details</h2>
+      {attributeRows.length > 0 ? (
+        <div class="gr-table-wrap">
+          <table class="gr-table">
+            <tbody>
+              {attributeRows.map((row) => (
+                <tr>
+                  <th style="width: 40%;">{row.label}</th>
+                  <td>{row.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>No structured attributes are declared for this product template yet.</p>
+      )}
+
+      <p style="margin-top:2rem; color: var(--gr-muted); font-size:0.9rem;">
+        A product template pre-fills a new inventory item's name, size and columns and binds it to
+        this definition by id, so the item can reflect updated definitions later. It does not track
+        stock on its own — quantities live on the items you create.
+      </p>
+    </div>
+
+    <aside class="gr-detail__aside">
+      <div class:list={['gr-device-artwork', { 'gr-device-artwork--fallback': !product.image }]}>
+        {product.image ? (
+          <img class="gr-device-artwork__product" src={product.image} alt={product.name} />
+        ) : (
+          <span class="gr-device-artwork__fallback">
+            <LucideIcon name={cat.icon} size={38} />
+          </span>
+        )}
+      </div>
+      <dl style="margin:0;">
+        {meta.map(([label, value]) => (
+          <div class="gr-meta-row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <a class="gr-btn gr-btn--ghost" href={definitionUrl} target="_blank" rel="noopener" style="width:100%; justify-content:center; margin-top:1.25rem;">
+        View product definition ↗
+      </a>
+    </aside>
+  </div>
+</SiteLayout>

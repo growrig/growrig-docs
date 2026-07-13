@@ -2,7 +2,7 @@
 title: Adding a device
 description: Contribute a driver and its products to the GrowRig supported-devices catalog.
 sidebar:
-  order: 7
+  order: 11
 ---
 
 The [supported-devices catalog](/devices/) is generated directly from device

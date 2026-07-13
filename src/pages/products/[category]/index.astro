@@ -1,0 +1,137 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import LucideIcon from '../../../components/LucideIcon.astro';
+import {
+  loadProductCategories,
+  findProductCategory,
+  categoryProductCount,
+  primaryColumn,
+  attributeLabel,
+} from '../../../lib/inventory';
+
+export function getStaticPaths() {
+  return loadProductCategories().map((cat) => ({ params: { category: cat.slug } }));
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { category } = Astro.params;
+const cat = findProductCategory(category!)!;
+const column = primaryColumn(cat);
+
+// Distinct values of the primary column that actually appear, for filter chips.
+const filterKey = column?.key;
+const filterValues = filterKey
+  ? [...new Set(cat.products.map((p) => p.attributes[filterKey]).filter(Boolean))].sort()
+  : [];
+---
+
+<SiteLayout
+  title={`${cat.label} — Supported products — GrowRig`}
+  description={`${categoryProductCount(cat)} ${cat.label.toLowerCase()} product templates GrowRig ships.`}
+>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/products/`}>Supported products</a>
+      <span>/</span>
+      <span>{cat.label}</span>
+    </nav>
+    <h1>{cat.label}</h1>
+    <p>{cat.description}</p>
+  </div>
+
+  <section class="gr-section" style="padding-top: 1.5rem;">
+    <div class="gr-container">
+      <div class="gr-toolbar">
+        <div class="gr-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+          <input
+            type="search"
+            id="gr-cat-search"
+            placeholder={`Search ${cat.label.toLowerCase()}…`}
+            autocomplete="off"
+            aria-label={`Search ${cat.label}`}
+          />
+        </div>
+        {
+          filterValues.length > 1 && (
+            <div class="gr-filters" id="gr-cat-filters">
+              <button class="gr-chip is-active" data-value="all">All</button>
+              {filterValues.map((value) => (
+                <button class="gr-chip" data-value={value}>
+                  {attributeLabel(value)}
+                </button>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="gr-device-grid" id="gr-cat-grid">
+        {cat.products.map((p) => (
+          <a
+            class="gr-device-card"
+            href={`${base}/products/${p.category}/${p.slug}/`}
+            data-value={filterKey ? (p.attributes[filterKey] ?? '') : ''}
+            data-search={`${p.name} ${p.brand ?? ''} ${p.description ?? ''} ${Object.values(p.attributes).join(' ')} ${p.variants.map((variant) => variant.size).join(' ')}`.toLowerCase()}
+          >
+            <div class:list={['gr-device-artwork', { 'gr-device-artwork--fallback': !p.image }]}>
+              {p.image ? (
+                <img class="gr-device-artwork__product" src={p.image} alt={p.name} />
+              ) : (
+                <span class="gr-device-artwork__fallback">
+                  <LucideIcon name={cat.icon} size={38} />
+                </span>
+              )}
+            </div>
+            <span class="gr-device-card__brand">{p.brand || cat.label}</span>
+            <h3>{p.name}</h3>
+            {p.description && <p>{p.description}</p>}
+            {p.variants.length > 0 && (
+              <ul class="gr-device-card__models" aria-label="Pack sizes">
+                {p.variants.map((variant) => <li>{variant.size}</li>)}
+              </ul>
+            )}
+            {filterKey && p.attributes[filterKey] && (
+              <span class="gr-tags"><span class="gr-tag">{attributeLabel(p.attributes[filterKey])}</span></span>
+            )}
+          </a>
+        ))}
+      </div>
+      <p class="gr-empty" id="gr-cat-empty" hidden>No products match.</p>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  const search = document.getElementById('gr-cat-search') as HTMLInputElement | null;
+  const filters = document.getElementById('gr-cat-filters');
+  const empty = document.getElementById('gr-cat-empty');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('#gr-cat-grid .gr-device-card'));
+  let activeValue = 'all';
+
+  function apply() {
+    const q = (search?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const matchesText = !q || (card.dataset.search ?? '').includes(q);
+      const matchesValue = activeValue === 'all' || card.dataset.value === activeValue;
+      const show = matchesText && matchesValue;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    }
+    if (empty) empty.hidden = visible !== 0;
+  }
+
+  search?.addEventListener('input', apply);
+  filters?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('.gr-chip');
+    if (!btn) return;
+    activeValue = btn.dataset.value ?? 'all';
+    filters.querySelectorAll('.gr-chip').forEach((c) => c.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    apply();
+  });
+</script>

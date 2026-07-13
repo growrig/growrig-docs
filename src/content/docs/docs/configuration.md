@@ -2,7 +2,7 @@
 title: Configuration
 description: Grow Core's YAML configuration modes and its HTTP + WebSocket API.
 sidebar:
-  order: 6
+  order: 10
 ---
 
 Grow Core is configured with YAML. The **same binary** runs in different modes, selected

@@ -19,6 +19,13 @@ A user should be able to:
 2. assemble a recommended system from verified hardware; or
 3. build and modify everything using open software and reference hardware.
 
+GrowRig is more than a climate controller. Alongside the automation it tracks the
+**cultivation** itself — [grows, plants, cultivars, and a care journal](/docs/grows-and-plants/) —
+keeps a stocked [inventory](/docs/inventory/) of the supplies a grow consumes, and
+connects to outside services through pluggable [integrations](/docs/integrations/),
+including an optional grow-scoped [AI assistant](/docs/ai-assistant/). All of it stays
+local-first and observable.
+
 ## The problem
 
 **Proprietary grow ecosystems** often deliver good onboarding and tightly integrated
@@ -58,7 +65,8 @@ Assistant automations:
 
 ```text
 Create grow environment → Discover devices → Assign roles → Test equipment →
-Configure safe fallback → Choose targets or recipe → Start automation
+Configure safe fallback → Choose targets or recipe → Start automation →
+Track plants, care & inventory as the grow runs
 ```
 
 ## Long-term differentiation

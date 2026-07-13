@@ -20,7 +20,7 @@ export function resolvePlatformRoot() {
 }
 
 export function resolvePlatformWatchPaths(platformRoot) {
-  return ['devices', 'vendors']
+  return ['devices', 'vendors', 'inventory', 'integrations']
     .map((dir) => path.join(platformRoot, dir))
     .filter((candidate) => existsSync(candidate) && statSync(candidate).isDirectory());
 }

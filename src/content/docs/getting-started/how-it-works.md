@@ -63,6 +63,23 @@ Because roles are separate from the actual hardware, you can replace a fan or se
 later and everything keeps working. This is the heart of GrowRig's
 [device model](/docs/device-model/).
 
+## More than the climate
+
+Holding your target conditions is the core job, but GrowRig also helps you keep track
+of the grow itself:
+
+- **Grows & plants** — set up a grow, track its plants (individually or as a batch),
+  and move them through stages like *seedling → vegetative → flowering*.
+- **Care journal** — log watering, feeding, training, and inspections, with photos, so
+  you have a real history of what you did and when.
+- **Inventory** — keep a stocked list of nutrients, media, and supplies, starting from
+  built-in product templates.
+- **Assistant** — an optional AI helper you can point at your own local model, that
+  answers questions with the context of your grow.
+
+These are all optional — you can use GrowRig purely for climate automation and ignore
+the rest.
+
 ## Safety is built in
 
 GrowRig controls real equipment, so safe behavior is a core part of the design, split

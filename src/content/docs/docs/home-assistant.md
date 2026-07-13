@@ -2,7 +2,7 @@
 title: Home Assistant integration
 description: How Grow Core talks to Home Assistant, and what each side is responsible for.
 sidebar:
-  order: 5
+  order: 9
 ---
 
 Home Assistant is GrowRig's compatibility layer. It handles device discovery,

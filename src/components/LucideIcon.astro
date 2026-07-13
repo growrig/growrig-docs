@@ -1,0 +1,19 @@
+---
+// Render any Lucide icon by its kebab-case name (as used in the platform's
+// inventory.yaml / category metadata). Falls back to a neutral box.
+import { icons } from '@lucide/astro';
+
+interface Props { name?: string; size?: number; strokeWidth?: number }
+const { name = 'box', size = 24, strokeWidth = 1.7 } = Astro.props;
+
+const pascal = (value: string) =>
+  value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+
+const registry = icons as Record<string, any>;
+const Icon = registry[pascal(name)] ?? registry.Box;
+---
+<Icon {size} stroke-width={strokeWidth} aria-hidden="true" />
