@@ -1,13 +1,13 @@
 import path from 'node:path';
-import { resolvePlatformRoot, resolvePlatformWatchPaths } from './lib/platform-paths.mjs';
+import { resolveCatalogRoot, resolveCatalogWatchPaths } from './lib/platform-paths.mjs';
 
-/** Watch growrig-platform so device and vendor edits reload the dev server. */
-export function growrigPlatformSync() {
-  const platformRoot = resolvePlatformRoot();
-  const watchPaths = platformRoot ? resolvePlatformWatchPaths(platformRoot) : [];
+/** Watch the catalog so device, vendor and species edits reload the dev server. */
+export function growrigCatalogSync() {
+  const catalogRoot = resolveCatalogRoot();
+  const watchPaths = catalogRoot ? resolveCatalogWatchPaths(catalogRoot) : [];
 
   return {
-    name: 'growrig-platform-sync',
+    name: 'growrig-catalog-sync',
     configureServer(server) {
       if (watchPaths.length === 0) return;
 

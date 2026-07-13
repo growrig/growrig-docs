@@ -24,7 +24,7 @@ const gallery = [
 ].filter((entry, index, entries) => entries.findIndex((candidate) => candidate.src === entry.src) === index);
 
 const description = device.description ?? `${device.title} device profile for GrowRig.`;
-const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/devices/${category}/${device.driverSlug}/device.yaml`;
+const definitionUrl = `https://github.com/growrig/growrig-catalog/blob/main/devices/${category}/${device.driverSlug}/device.yaml`;
 
 // Render the optional guide, dropping its leading H1 (shown as the page title).
 let guideHtml = '';

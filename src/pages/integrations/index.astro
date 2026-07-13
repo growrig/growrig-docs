@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import LucideIcon from '../../components/LucideIcon.astro';
+import CatalogCallout from '../../components/CatalogCallout.astro';
 import {
   loadIntegrationCategories,
   allIntegrations,
@@ -78,6 +79,12 @@ const searchData = integrations.map((i) => ({
       <!-- Search results (hidden until searching) -->
       <div class="gr-device-grid" id="gr-search-results" hidden></div>
       <p class="gr-empty" id="gr-search-empty" hidden>No integrations match your search.</p>
+
+      <CatalogCallout
+        noun="integrations"
+        docsPath="/docs/adding-an-integration/"
+        docsLabel="Add an integration"
+      />
     </div>
   </section>
 </SiteLayout>

@@ -9,13 +9,20 @@ const path = Astro.url.pathname;
 const links = [
   { label: 'Getting Started', href: `${base}/getting-started/`, match: `${base}/getting-started` },
   { label: 'Documentation', href: `${base}/docs/`, match: `${base}/docs` },
+];
+
+// The catalog browsers are grouped under a "Catalog" dropdown to keep the
+// top-level nav short.
+const moreLinks = [
   { label: 'Devices', href: `${base}/devices/`, match: `${base}/devices` },
   { label: 'Products', href: `${base}/products/`, match: `${base}/products` },
   { label: 'Integrations', href: `${base}/integrations/`, match: `${base}/integrations` },
+  { label: 'Species', href: `${base}/species/`, match: `${base}/species` },
   { label: 'Vendors', href: `${base}/vendors/`, match: `${base}/vendors` },
 ];
 
 const isActive = (match: string) => path === match || path.startsWith(`${match}/`);
+const moreActive = moreLinks.some((link) => isActive(link.match));
 ---
 
 <div class="site-title-wrap">
@@ -30,8 +37,49 @@ const isActive = (match: string) => path === match || path.startsWith(`${match}/
         </a>
       ))
     }
+    <div class:list={['site-nav-group', { active: moreActive }]}>
+      <button class="site-nav-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+        Catalog
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+      <div class="site-nav-menu">
+        {
+          moreLinks.map((link) => (
+            <a href={link.href} class={isActive(link.match) ? 'active' : undefined}>
+              {link.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
   </nav>
 </div>
+
+<script is:inline>
+  (() => {
+    const group = document.querySelector('.site-nav-group');
+    const trigger = group?.querySelector('.site-nav-trigger');
+    if (!group || !trigger) return;
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = group.getAttribute('data-open') === 'true';
+      group.setAttribute('data-open', String(!open));
+      trigger.setAttribute('aria-expanded', String(!open));
+    });
+    document.addEventListener('click', () => {
+      group.setAttribute('data-open', 'false');
+      trigger.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        group.setAttribute('data-open', 'false');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+</script>
 
 <style>
   .site-title-wrap {
@@ -65,6 +113,73 @@ const isActive = (match: string) => path === match || path.startsWith(`${match}/
   }
   .site-nav a.active {
     color: var(--sl-color-accent-high);
+  }
+  /* Starlight's title wrapper clips overflow, which would cut off the
+     dropdown; let it escape. The title here is a fixed-size logo, so there is
+     nothing to truncate. */
+  :global(.title-wrapper) {
+    overflow: visible !important;
+  }
+  .site-nav-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .site-nav-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .site-nav-trigger:hover {
+    color: var(--sl-color-white);
+    background: var(--sl-color-gray-6);
+  }
+  .site-nav-group.active .site-nav-trigger {
+    color: var(--sl-color-accent-high);
+  }
+  .site-nav-trigger .chev {
+    transition: transform 0.15s;
+  }
+  .site-nav-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.4rem;
+    background: var(--sl-color-bg-nav, var(--sl-color-bg));
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 12px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+    z-index: 60;
+  }
+  .site-nav-group:hover .site-nav-menu,
+  .site-nav-group:focus-within .site-nav-menu,
+  .site-nav-group[data-open='true'] .site-nav-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .site-nav-group:hover .site-nav-trigger .chev,
+  .site-nav-group:focus-within .site-nav-trigger .chev,
+  .site-nav-group[data-open='true'] .site-nav-trigger .chev {
+    transform: rotate(180deg);
   }
   /* Show inline nav only when there's room; Starlight handles mobile via its
      own menu, and these sections are reachable from the sidebar too. */

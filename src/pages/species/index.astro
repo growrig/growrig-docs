@@ -1,0 +1,47 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import CatalogCallout from '../../components/CatalogCallout.astro';
+import { loadSpecies, speciesTagline } from '../../lib/species';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const species = loadSpecies();
+---
+
+<SiteLayout
+  title="Supported species — GrowRig"
+  description="Crop species GrowRig ships — cultivation stages, cultivar attributes, care actions and feeding schedules."
+>
+  <div class="gr-container gr-page-head">
+    <h1>Supported species</h1>
+    <p>
+      Crop definitions GrowRig ships for its cultivation layer. Each species declares its
+      cultivation stages and default photoperiod, the cultivar attributes a variety carries, the
+      care actions a grower can log, and any built-in feeding schedules. Pick one to see the full
+      definition.
+    </p>
+  </div>
+
+  <section class="gr-section" style="padding-top: 1.5rem;">
+    <div class="gr-container">
+      <div class="gr-cat-grid">
+        {
+          species.map((s) => (
+            <a class="gr-cat-card" href={`${base}/species/${s.slug}/`}>
+              <span class="gr-cat-card__icon">
+                <LucideIcon name={s.icon} />
+              </span>
+              <h3>{s.label}</h3>
+              <p>{speciesTagline(s.slug)}</p>
+              <span class="gr-cat-card__count">
+                {s.stages.length} stage{s.stages.length === 1 ? '' : 's'}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <CatalogCallout noun="species" docsPath="/docs/grows-and-plants/" docsLabel="About species" />
+    </div>
+  </section>
+</SiteLayout>

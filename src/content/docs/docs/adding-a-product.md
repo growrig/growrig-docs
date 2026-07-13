@@ -6,8 +6,9 @@ sidebar:
 ---
 
 The [supported-products catalog](/products/) is generated directly from product
-definitions in the platform repository — the same way the
-[devices catalog](/devices/) is generated from device profiles. A **product** is
+definitions in the [`growrig-catalog`](https://github.com/growrig/growrig-catalog)
+repository — the same way the [devices catalog](/devices/) is generated from
+device profiles. A **product** is
 a ready-made template for a real-world item that pre-fills a new inventory item
 and stays bound to the definition. See [Inventory & products](/docs/inventory/)
 for how templates, categories, and items relate.
@@ -17,7 +18,7 @@ for how templates, categories, and items relate.
 Products live in a category's `products.yaml`:
 
 ```text
-growrig-platform/inventory/<category>/products.yaml
+growrig-catalog/inventory/<category>/products.yaml
 ```
 
 The **path** supplies the category (`consumables`, `plant-material`,
@@ -63,5 +64,5 @@ npm run dev
 ```
 
 There is no separate generation step — the site reads the inventory definitions
-directly at build time from the sibling `growrig-platform` repository (falling
+directly at build time from the sibling `growrig-catalog` repository (falling
 back to the bundled snapshot in `source/`).

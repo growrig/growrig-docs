@@ -138,6 +138,80 @@ img {
   color: var(--gr-accent);
 }
 
+/* "Other" dropdown */
+.gr-nav__group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gr-nav__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gr-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.gr-nav__trigger:hover {
+  color: var(--gr-text);
+  background: var(--gr-surface-2);
+}
+
+.gr-nav__group.is-active .gr-nav__trigger {
+  color: var(--gr-accent);
+}
+
+.gr-nav__trigger .chev {
+  transition: transform 0.15s;
+}
+
+.gr-nav__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem;
+  background: var(--gr-bg);
+  border: 1px solid var(--gr-border);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+  z-index: 60;
+}
+
+.gr-nav__menu a {
+  white-space: nowrap;
+}
+
+.gr-nav__group:hover .gr-nav__menu,
+.gr-nav__group:focus-within .gr-nav__menu,
+.gr-nav__group[data-open='true'] .gr-nav__menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.gr-nav__group:hover .gr-nav__trigger .chev,
+.gr-nav__group:focus-within .gr-nav__trigger .chev,
+.gr-nav__group[data-open='true'] .gr-nav__trigger .chev {
+  transform: rotate(180deg);
+}
+
 .gr-header__spacer {
   flex: 1;
 }
@@ -908,5 +982,25 @@ img {
   }
   .gr-nav.is-open a {
     padding: 0.7rem;
+  }
+  /* Flatten the "Other" dropdown into the stacked mobile menu. */
+  .gr-nav.is-open .gr-nav__group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .gr-nav.is-open .gr-nav__trigger {
+    display: none;
+  }
+  .gr-nav.is-open .gr-nav__menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    min-width: 0;
+    padding: 0;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
 }

@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import LucideIcon from '../../components/LucideIcon.astro';
+import CatalogCallout from '../../components/CatalogCallout.astro';
 import {
   loadProductCategories,
   allInventoryProducts,
@@ -80,6 +81,8 @@ const searchData = products.map((p) => ({
       <!-- Search results (hidden until searching) -->
       <div class="gr-device-grid" id="gr-search-results" hidden></div>
       <p class="gr-empty" id="gr-search-empty" hidden>No products match your search.</p>
+
+      <CatalogCallout noun="products" docsPath="/docs/adding-a-product/" docsLabel="Add a product" />
     </div>
   </section>
 </SiteLayout>

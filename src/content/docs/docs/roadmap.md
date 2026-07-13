@@ -14,7 +14,7 @@ engine, drawing several Phase 5 items forward.
 
 ## Phase 0 — Project foundation ✅
 
-Publish concept and architecture, define terminology, create `growrig-platform` and
+Publish concept and architecture, define terminology, create `growrig` and
 `growrig-firmware`, choose licenses, and establish the contribution process.
 
 ## Phase 1 — Breadboard fan controller

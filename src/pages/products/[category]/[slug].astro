@@ -15,7 +15,7 @@ const cat = findProductCategory(category!)!;
 const product = cat.products.find((p) => p.slug === slug)!;
 
 const description = product.description ?? `${product.name} product template for GrowRig.`;
-const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/inventory/${category}/products.yaml`;
+const definitionUrl = `https://github.com/growrig/growrig-catalog/blob/main/inventory/${category}/products.yaml`;
 
 // Turn attributes into labelled rows using the category's column definitions.
 const columnByKey = new Map(cat.columns.map((column) => [column.key, column]));

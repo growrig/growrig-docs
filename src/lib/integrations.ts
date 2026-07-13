@@ -1,28 +1,11 @@
-import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import { resolveCatalogDir } from './catalog-paths';
 
-// Astro runs dev/build from the project root, so cwd is a stable anchor even
-// after this module is bundled into dist/ during the build.
-const repoRoot = process.cwd();
-
-/** Resolve the platform integrations directory, preferring the sibling repo. */
+/** Resolve the catalog integrations directory. */
 function resolveIntegrationsRoot(): string {
-  const candidates = [
-    process.env.GROWRIG_INTEGRATIONS_DIR,
-    path.resolve(repoRoot, '../growrig-platform/integrations'),
-    path.resolve(repoRoot, 'source/growrig-platform/integrations'),
-  ].filter(Boolean) as string[];
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate) && statSync(candidate).isDirectory()) return candidate;
-  }
-
-  throw new Error(
-    `Cannot find the GrowRig integrations catalog. Set GROWRIG_INTEGRATIONS_DIR or place growrig-platform beside this repo. Checked:\n${candidates
-      .map((c) => `  - ${c}`)
-      .join('\n')}`,
-  );
+  return resolveCatalogDir('integrations', 'GROWRIG_INTEGRATIONS_DIR');
 }
 
 export interface ConfigField {

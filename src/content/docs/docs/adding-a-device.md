@@ -6,7 +6,9 @@ sidebar:
 ---
 
 The [supported-devices catalog](/devices/) is generated directly from device
-definitions in the platform repository. GrowRig distinguishes two things:
+definitions in the [`growrig-catalog`](https://github.com/growrig/growrig-catalog)
+repository — the default content catalog, which the platform also mounts as a git
+submodule at `growrig/catalog/`. GrowRig distinguishes two things:
 
 - a **driver** — how GrowRig binds to and controls a *class* of hardware
   (capabilities, Home Assistant integration, control defaults). Often "Generic".
@@ -20,7 +22,7 @@ The catalog lists **products**; each points back to the driver that powers it.
 A driver lives at:
 
 ```text
-growrig-platform/devices/<category>/<driver-id>/device.yaml
+growrig-catalog/devices/<category>/<driver-id>/device.yaml
 ```
 
 The **path** supplies the category (`controller`, `sensor`, `fan`, `light`,
@@ -70,7 +72,7 @@ inside `products`; the catalogue loader adds it automatically.
 
 ### Vendor and product artwork
 
-Set `vendor` to a stable vendor id from `growrig-platform/vendors/<vendor-id>/`.
+Set `vendor` to a stable vendor id from `growrig-catalog/vendors/<vendor-id>/`.
 Each vendor directory contains `vendor.yaml` and may contain a reusable real logo. The
 [vendor catalogue](/vendors/) and device pages both read those shared files.
 
@@ -96,13 +98,22 @@ troubleshooting. Its content is rendered on the product page.
 
 ## Verify
 
-Both Grow Core and this docs site read the same tree. Run the docs locally and the
-new products appear in their category automatically:
+Both Grow Core and this docs site read the same catalog tree. Run the docs
+locally and the new products appear in their category automatically:
 
 ```bash
 npm run dev
 ```
 
 There is no separate generation step — the site reads the device definitions
-directly at build time from the sibling `growrig-platform` repository (falling
-back to the bundled snapshot in `source/`).
+directly at build time from the sibling `growrig-catalog` checkout (falling back
+to the platform's `catalog/` submodule, then the bundled snapshot in `source/`).
+
+## Ship it your way
+
+Contributing to `growrig-catalog` adds a device for everyone. You don't have to:
+any public repository carrying a compatible `catalog.yaml` manifest and this same
+`devices/<category>/<id>/device.yaml` layout can be added to a single GrowRig
+installation as an extra catalog source under **Control panel → Catalogs**. Custom
+entries are cached beside the Grow Core database and merged with the built-ins — no
+fork or rebuild required.

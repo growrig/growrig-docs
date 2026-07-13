@@ -54,7 +54,7 @@ channels:
 Each supported device has a profile at:
 
 ```text
-growrig-platform/devices/<category>/<slug>/device.yaml
+growrig-catalog/devices/<category>/<slug>/device.yaml
 ```
 
 The directory path supplies the stable **category** and **slug**; the YAML supplies

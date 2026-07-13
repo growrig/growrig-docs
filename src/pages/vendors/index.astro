@@ -1,5 +1,6 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import CatalogCallout from '../../components/CatalogCallout.astro';
 import { loadVendors } from '../../lib/vendors';
 const vendors = loadVendors();
 ---
@@ -20,6 +21,7 @@ const vendors = loadVendors();
           </a>
         ))}
       </div>
+      <CatalogCallout noun="vendors" docsPath="/docs/adding-a-device/" docsLabel="Add a vendor" />
     </div>
   </main>
 </SiteLayout>

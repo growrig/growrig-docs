@@ -3,6 +3,7 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import { loadCategories, categoryProductCount, totalProductCount } from '../lib/devices';
 import { totalProductCount as totalInventoryCount } from '../lib/inventory';
 import { totalIntegrationCount } from '../lib/integrations';
+import { totalSpeciesCount } from '../lib/species';
 import CategoryIcon from '../components/CategoryIcon.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -10,6 +11,7 @@ const categories = loadCategories();
 const deviceCount = totalProductCount();
 const inventoryCount = totalInventoryCount();
 const integrationCount = totalIntegrationCount();
+const speciesCount = totalSpeciesCount();
 
 const features = [
   {
@@ -142,9 +144,16 @@ const flow = [
     <div class="gr-container">
       <div class="gr-section__head">
         <h2>Beyond the hardware</h2>
-        <p>GrowRig also ships a stocked inventory catalog and connects to outside services.</p>
+        <p>GrowRig also ships crop definitions, a stocked inventory catalog, and connects to outside services.</p>
       </div>
       <div class="gr-grid">
+        <a class="gr-card" href={`${base}/species/`}>
+          <span class="gr-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10M10 20c5.5-2.5.8-8.4 5-10M9.5 9.4c1 2.5-.7 4.7-2.5 5.3-1.4.5-2.7.6-3.5.8 1.6-1.3 2.6-3.2 3.5-5.3.7-1.6 2-3.4 4.5-3.4M14.1 6a7 7 0 0 1 4.9 8.5"/></svg>
+          </span>
+          <h3>Supported species</h3>
+          <p>{speciesCount} crop definitions — stages, cultivar attributes, care actions and feeding schedules for your grows.</p>
+        </a>
         <a class="gr-card" href={`${base}/products/`}>
           <span class="gr-card__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31M14 9.3V2M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0M5.52 16h12.96"/></svg>

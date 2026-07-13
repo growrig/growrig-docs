@@ -1,0 +1,73 @@
+---
+// Info box shown under each catalog browser: the listed entries are the
+// built-in defaults, and admins can extend them with their own catalog sources.
+interface Props {
+  /** Plural noun for the listed entries, e.g. "devices", "species". */
+  noun: string;
+  /** Optional docs path (relative to the site base) with authoring details. */
+  docsPath?: string;
+  /** Label for the docs link. */
+  docsLabel?: string;
+}
+
+const { noun, docsPath, docsLabel = 'How to add your own' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const href = docsPath ? `${base}${docsPath}` : undefined;
+---
+
+<aside class="gr-catalog-note">
+  <span class="gr-catalog-note__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 16v-4M12 8h.01"></path>
+    </svg>
+  </span>
+  <p>
+    These are GrowRig's built-in {noun} — the default catalog, not a closed list. Admins can add
+    any public repository with a compatible <code>catalog.yaml</code> under{' '}
+    <strong>Control panel → Catalogs</strong> to maintain their own without forking.
+    {href && <> <a href={href}>{docsLabel} →</a></>}
+  </p>
+</aside>
+
+<style>
+  .gr-catalog-note {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--gr-border);
+    color: var(--gr-muted);
+  }
+  .gr-catalog-note__icon {
+    flex-shrink: 0;
+    line-height: 0;
+    margin-top: 0.15rem;
+    opacity: 0.7;
+  }
+  .gr-catalog-note__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .gr-catalog-note p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    max-width: 68ch;
+  }
+  .gr-catalog-note code {
+    font-size: 0.85em;
+    padding: 0.05em 0.35em;
+    border-radius: 5px;
+    background: var(--gr-surface-2);
+  }
+  .gr-catalog-note strong {
+    font-weight: 600;
+    color: var(--gr-text);
+  }
+  .gr-catalog-note a {
+    color: var(--gr-accent);
+    white-space: nowrap;
+  }
+</style>

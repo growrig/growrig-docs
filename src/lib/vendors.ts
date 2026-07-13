@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { allProducts, productCount } from './devices';
+import { resolveCatalogDir } from './catalog-paths';
 
 export interface Vendor {
   id: string;
@@ -14,10 +15,7 @@ export interface Vendor {
 }
 
 function root(): string {
-  const candidates = [process.env.GROWRIG_VENDORS_DIR, path.resolve(process.cwd(), '../growrig-platform/vendors'), path.resolve(process.cwd(), 'source/growrig-platform/vendors')].filter(Boolean) as string[];
-  const found = candidates.find((candidate) => existsSync(candidate) && statSync(candidate).isDirectory());
-  if (!found) throw new Error(`Cannot find the GrowRig vendor catalog. Set GROWRIG_VENDORS_DIR.`);
-  return found;
+  return resolveCatalogDir('vendors', 'GROWRIG_VENDORS_DIR');
 }
 
 export function loadVendors(): Vendor[] {

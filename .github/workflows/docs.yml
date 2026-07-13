@@ -22,16 +22,11 @@ jobs:
       - name: Check out docs
         uses: actions/checkout@v4
 
-      - name: Check out GrowRig Platform (catalogs)
+      - name: Check out GrowRig catalog
         uses: actions/checkout@v4
         with:
-          repository: growrig/growrig-platform
-          path: source/growrig-platform
-          sparse-checkout: |
-            devices
-            vendors
-            inventory
-            integrations
+          repository: growrig/growrig-catalog
+          path: source/growrig-catalog
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

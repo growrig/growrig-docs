@@ -1,28 +1,11 @@
-import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import { resolveCatalogDir } from './catalog-paths';
 
-// Astro runs dev/build from the project root, so cwd is a stable anchor even
-// after this module is bundled into dist/ during the build.
-const repoRoot = process.cwd();
-
-/** Resolve the platform device directory, preferring the sibling repo. */
+/** Resolve the catalog device directory. */
 function resolveDevicesRoot(): string {
-  const candidates = [
-    process.env.GROWRIG_DEVICES_DIR,
-    path.resolve(repoRoot, '../growrig-platform/devices'),
-    path.resolve(repoRoot, 'source/growrig-platform/devices'),
-  ].filter(Boolean) as string[];
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate) && statSync(candidate).isDirectory()) return candidate;
-  }
-
-  throw new Error(
-    `Cannot find the GrowRig device catalog. Set GROWRIG_DEVICES_DIR or place growrig-platform beside this repo. Checked:\n${candidates
-      .map((c) => `  - ${c}`)
-      .join('\n')}`,
-  );
+  return resolveCatalogDir('devices', 'GROWRIG_DEVICES_DIR');
 }
 
 export interface Capability {

@@ -6,7 +6,8 @@ sidebar:
 ---
 
 The [supported-integrations catalog](/integrations/) is generated directly from
-bundle definitions in the platform repository. A **bundle** describes an external
+bundle definitions in the [`growrig-catalog`](https://github.com/growrig/growrig-catalog)
+repository. A **bundle** describes an external
 service GrowRig can connect to — its capabilities, its config fields, and how it
 runs. See [External integrations](/docs/integrations/) for the full model
 (bundles, instances, capabilities, bindings).
@@ -19,7 +20,7 @@ defined entirely in YAML.
 A bundle lives at:
 
 ```text
-growrig-platform/integrations/<category>/<id>/integration.yaml
+growrig-catalog/integrations/<category>/<id>/integration.yaml
 ```
 
 The **path** supplies the category (`ai`, `data`, `notification`) and the bundle
@@ -84,5 +85,5 @@ npm run dev
 ```
 
 There is no separate generation step — the site reads the integration
-definitions directly at build time from the sibling `growrig-platform`
+definitions directly at build time from the sibling `growrig-catalog`
 repository (falling back to the bundled snapshot in `source/`).

@@ -1,0 +1,225 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import LucideIcon from '../../components/LucideIcon.astro';
+import { loadSpecies, findSpecies, speciesTagline } from '../../lib/species';
+
+export function getStaticPaths() {
+  return loadSpecies().map((s) => ({ params: { slug: s.slug } }));
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { slug } = Astro.params;
+const species = findSpecies(slug!)!;
+const description = `${species.label} — cultivation stages, cultivar attributes, care actions and feeding schedules in GrowRig.`;
+const definitionUrl = `https://github.com/growrig/growrig-catalog/blob/main/species/${species.slug}/species.yaml`;
+
+const lightLabel = (hours: number) =>
+  hours <= 0 ? 'Dark' : `${hours}h light / ${24 - hours}h dark`;
+
+const meta: Array<[string, string]> = [
+  ['Stages', String(species.stages.length)],
+  ['Cultivar attributes', String(species.cultivarAttributes.length)],
+  ['Care actions', String(species.careActions.length)],
+];
+if (species.feedingPresets.length) meta.push(['Feeding presets', String(species.feedingPresets.length)]);
+---
+
+<SiteLayout title={`${species.label} — GrowRig`} description={description}>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/species/`}>Supported species</a>
+      <span>/</span>
+      <span>{species.label}</span>
+    </nav>
+    <h1>{species.label}</h1>
+    <p>{speciesTagline(species.slug)}</p>
+  </div>
+
+  <div class="gr-container gr-detail">
+    <div class="gr-prose">
+      <h2>Cultivation stages</h2>
+      <p>
+        The ordered growth sequence for a {species.label.toLowerCase()} grow. The default daily light
+        hours seed the photoperiod editor when you start a grow; you can override them per grow.
+      </p>
+      <div class="gr-table-wrap">
+        <table class="gr-table">
+          <thead><tr><th>#</th><th>Stage</th><th>Default photoperiod</th></tr></thead>
+          <tbody>
+            {species.stages.map((stage, i) => (
+              <tr>
+                <td>{i + 1}</td>
+                <td style="text-transform:capitalize;">{stage.name}</td>
+                <td>{lightLabel(stage.lightHours)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Cultivar attributes</h2>
+      {species.cultivarAttributes.length > 0 ? (
+        <>
+          <p>
+            Species-specific fields every cultivar (variety) of {species.label.toLowerCase()} carries.
+            The cultivar form renders these dynamically.
+          </p>
+          <div class="gr-table-wrap">
+            <table class="gr-table">
+              <thead><tr><th>Attribute</th><th>Type</th><th>Values</th></tr></thead>
+              <tbody>
+                {species.cultivarAttributes.map((attr) => (
+                  <tr>
+                    <td>{attr.label}</td>
+                    <td><code>{attr.type}</code></td>
+                    <td>
+                      {attr.options?.length
+                        ? attr.options.join(', ')
+                        : attr.unit
+                          ? attr.unit
+                          : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p>This species declares no cultivar-specific attributes.</p>
+      )}
+
+      <h2>Care actions</h2>
+      <p>The manual actions you can log against this crop's plants in the care journal.</p>
+      <ul class="gr-care-actions">
+        {species.careActions.map((action) => (
+          <li class="gr-care-action">
+            <span class="gr-care-action__icon"><LucideIcon name={action.icon} size={20} /></span>
+            <div>
+              <strong>
+                {action.label}
+                {action.quick && <span class="gr-tag">quick</span>}
+              </strong>
+              {action.fields.length > 0 && (
+                <span class="gr-care-action__fields">{action.fields.join(' · ')}</span>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {species.feedingPresets.length > 0 && (
+        <>
+          <h2>Feeding schedules</h2>
+          <p>
+            Built-in nutrient charts shipped for {species.label.toLowerCase()}. These are read-only in
+            the app — duplicate one to build your own editable variant.
+          </p>
+          <div class="gr-feeding-grid">
+            {species.feedingPresets.map((preset) => (
+              <div class="gr-feeding-card">
+                <div class="gr-feeding-card__head">
+                  <strong>{preset.name}</strong>
+                  {preset.brand && <span class="gr-tag">{preset.brand}</span>}
+                </div>
+                {preset.description && <p>{preset.description}</p>}
+                <span class="gr-feeding-card__meta">
+                  {preset.productCount} product{preset.productCount === 1 ? '' : 's'}
+                  {preset.weekCount > 0 && <> · {preset.weekCount} week{preset.weekCount === 1 ? '' : 's'}</>}
+                  {preset.unit && <> · {preset.unit}</>}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <p style="margin-top:2rem; color: var(--gr-muted); font-size:0.9rem;">
+        Species are crop definitions in the GrowRig catalog. A <strong>cultivar</strong> is a
+        user-defined variety within a species; a <strong>grow</strong> is one run of a species and
+        cultivar through these stages. See <a href={`${base}/docs/grows-and-plants/`}>Grows &amp; plants</a>.
+      </p>
+    </div>
+
+    <aside class="gr-detail__aside">
+      <div class="gr-device-artwork gr-device-artwork--fallback">
+        <span class="gr-device-artwork__fallback"><LucideIcon name={species.icon} size={38} /></span>
+      </div>
+      <dl style="margin:0;">
+        {meta.map(([label, value]) => (
+          <div class="gr-meta-row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <a class="gr-btn gr-btn--ghost" href={definitionUrl} target="_blank" rel="noopener" style="width:100%; justify-content:center; margin-top:1.25rem;">
+        View species definition ↗
+      </a>
+    </aside>
+  </div>
+</SiteLayout>
+
+<style>
+  .gr-care-actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.6rem;
+  }
+  .gr-care-action {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--gr-border);
+    border-radius: 12px;
+    background: var(--gr-surface);
+  }
+  .gr-care-action__icon {
+    color: var(--gr-accent);
+    line-height: 0;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .gr-care-action strong {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .gr-care-action__fields {
+    display: block;
+    color: var(--gr-muted);
+    font-size: 0.82rem;
+    margin-top: 0.15rem;
+    text-transform: capitalize;
+  }
+  .gr-feeding-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+  .gr-feeding-card {
+    border: 1px solid var(--gr-border);
+    border-radius: 12px;
+    padding: 1rem;
+    background: var(--gr-surface);
+  }
+  .gr-feeding-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+  .gr-feeding-card p {
+    color: var(--gr-muted);
+    font-size: 0.88rem;
+    margin: 0.5rem 0;
+  }
+  .gr-feeding-card__meta {
+    color: var(--gr-muted);
+    font-size: 0.82rem;
+  }
+</style>

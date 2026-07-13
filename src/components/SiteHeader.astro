@@ -7,15 +7,23 @@ const path = Astro.url.pathname;
 const links = [
   { label: 'Getting Started', href: `${base}/getting-started/`, match: '/getting-started' },
   { label: 'Documentation', href: `${base}/docs/`, match: '/docs' },
+];
+
+// The catalog browsers are grouped under a "Catalog" dropdown to keep the
+// top-level nav short.
+const moreLinks = [
   { label: 'Devices', href: `${base}/devices/`, match: '/devices' },
   { label: 'Products', href: `${base}/products/`, match: '/products' },
   { label: 'Integrations', href: `${base}/integrations/`, match: '/integrations' },
+  { label: 'Species', href: `${base}/species/`, match: '/species' },
   { label: 'Vendors', href: `${base}/vendors/`, match: '/vendors' },
 ];
 
 function isActive(match: string) {
   return path === match || path.startsWith(`${match}/`) || path.startsWith(`${base}${match}`);
 }
+
+const moreActive = moreLinks.some((link) => isActive(link.match));
 ---
 
 <header class="gr-header">
@@ -32,6 +40,23 @@ function isActive(match: string) {
           </a>
         ))
       }
+      <div class={`gr-nav__group${moreActive ? ' is-active' : ''}`} id="gr-nav-more">
+        <button class="gr-nav__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+          Catalog
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+        <div class="gr-nav__menu">
+          {
+            moreLinks.map((link) => (
+              <a href={link.href} class={isActive(link.match) ? 'is-active' : undefined}>
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
     </nav>
 
     <div class="gr-header__spacer"></div>
@@ -92,5 +117,26 @@ function isActive(match: string) {
   menuBtn?.addEventListener('click', () => {
     const open = nav?.classList.toggle('is-open');
     menuBtn.setAttribute('aria-expanded', String(!!open));
+  });
+
+  // "Other" dropdown — hover/focus opens it via CSS; this adds click + touch
+  // toggling and closes it when clicking away or pressing Escape.
+  const more = document.getElementById('gr-nav-more');
+  const moreTrigger = more?.querySelector('.gr-nav__trigger');
+  moreTrigger?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = more?.getAttribute('data-open') === 'true';
+    more?.setAttribute('data-open', String(!open));
+    moreTrigger.setAttribute('aria-expanded', String(!open));
+  });
+  document.addEventListener('click', () => {
+    more?.setAttribute('data-open', 'false');
+    moreTrigger?.setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      more?.setAttribute('data-open', 'false');
+      moreTrigger?.setAttribute('aria-expanded', 'false');
+    }
   });
 </script>

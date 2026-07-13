@@ -4,12 +4,18 @@ import { fileURLToPath } from 'node:url';
 
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
-/** Prefer the sibling growrig-platform repo, then the bundled snapshot. */
-export function resolvePlatformRoot() {
+/**
+ * Prefer the sibling growrig-catalog checkout, then the platform's catalog
+ * submodule, then the bundled snapshot, then the pre-split platform layout.
+ */
+export function resolveCatalogRoot() {
   const candidates = [
-    process.env.GROWRIG_PLATFORM_DIR,
-    path.resolve(repoRoot, '../growrig-platform'),
-    path.resolve(repoRoot, 'source/growrig-platform'),
+    process.env.GROWRIG_CATALOG_DIR,
+    path.resolve(repoRoot, '../growrig-catalog'),
+    path.resolve(repoRoot, '../growrig/catalog'),
+    path.resolve(repoRoot, 'source/growrig-catalog'),
+    path.resolve(repoRoot, '../growrig'),
+    path.resolve(repoRoot, 'source/growrig'),
   ].filter(Boolean);
 
   for (const candidate of candidates) {
@@ -19,8 +25,8 @@ export function resolvePlatformRoot() {
   return null;
 }
 
-export function resolvePlatformWatchPaths(platformRoot) {
-  return ['devices', 'vendors', 'inventory', 'integrations']
-    .map((dir) => path.join(platformRoot, dir))
+export function resolveCatalogWatchPaths(catalogRoot) {
+  return ['devices', 'vendors', 'inventory', 'integrations', 'species']
+    .map((dir) => path.join(catalogRoot, dir))
     .filter((candidate) => existsSync(candidate) && statSync(candidate).isDirectory());
 }

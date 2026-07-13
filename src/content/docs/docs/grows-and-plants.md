@@ -40,8 +40,10 @@ or removed, and each action is part of the record.
 
 ## Species & cultivars
 
-A **species** is a crop definition shipped as YAML in the platform repository
-(`species/<id>/species.yaml`). It declares:
+A **species** is a crop definition shipped as YAML in the
+[`growrig-catalog`](https://github.com/growrig/growrig-catalog) content catalog
+(`species/<id>/species.yaml`). The full set is browsable at
+[Supported species](/species/). It declares:
 
 - the default **stage sequence** and each stage's default light hours;
 - **cultivar attributes** — the species-specific fields a variety carries

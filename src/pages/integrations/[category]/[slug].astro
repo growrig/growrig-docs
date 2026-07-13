@@ -16,7 +16,7 @@ const cat = findIntegrationCategory(category!)!;
 const integration = cat.integrations.find((i) => i.slug === slug)!;
 
 const description = integration.description ?? `${integration.name} integration for GrowRig.`;
-const definitionUrl = `https://github.com/growrig/growrig-platform/blob/main/integrations/${category}/${integration.slug}/integration.yaml`;
+const definitionUrl = `https://github.com/growrig/growrig-catalog/blob/main/integrations/${category}/${integration.slug}/integration.yaml`;
 
 // Render the README, dropping its leading H1 (shown as the page title).
 let readmeHtml = '';
