@@ -28,6 +28,13 @@ jobs:
           repository: growrig/growrig-catalog
           path: source/growrig-catalog
 
+      - name: Check out GrowRig platform schemas
+        uses: actions/checkout@v4
+        with:
+          repository: growrig/growrig
+          path: source/growrig
+          sparse-checkout: schema
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
