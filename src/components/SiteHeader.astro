@@ -110,21 +110,21 @@ const moreActive = moreLinks.some((link) => isActive(link.match));
   </div>
 </header>
 
-<!-- Search modal. Reuses the Pagefind index Starlight builds for the docs, so
-     Cmd/Ctrl+K works on these custom pages too (homepage, catalog). Pagefind
-     assets only exist in a production build, so search is inert under `astro dev`. -->
-<div class="gr-search" id="gr-search" data-pagefind-base={`${base}/pagefind/`} hidden>
-  <div class="gr-search__backdrop" data-search-close></div>
-  <div class="gr-search__dialog" role="dialog" aria-modal="true" aria-label="Search the docs">
-    <div id="gr-search__ui" class="gr-search__ui"></div>
-    <div class="gr-search__unavailable" hidden>
-      Search runs on the built site. Try it on <a href="https://growrig.dev">growrig.dev</a>.
-    </div>
-    <p class="gr-search__foot">
-      <span><kbd>↵</kbd> to select · <kbd>Esc</kbd> to close</span>
-    </p>
+<!-- Search modal. A native <dialog> opened with showModal() renders in the top
+     layer with a real ::backdrop — the same approach Starlight's search uses —
+     so it can't be occluded by page stacking contexts. It reuses the Pagefind
+     index Starlight builds for the docs, so Cmd/Ctrl+K works on these custom
+     pages too. Pagefind assets only exist in a production build, so search is
+     inert under `astro dev`. -->
+<dialog class="gr-search" id="gr-search" aria-label="Search the docs" data-pagefind-base={`${base}/pagefind/`}>
+  <div id="gr-search__ui" class="gr-search__ui"></div>
+  <div class="gr-search__unavailable" hidden>
+    Search runs on the built site. Try it on <a href="https://growrig.dev">growrig.dev</a>.
   </div>
-</div>
+  <p class="gr-search__foot">
+    <span><kbd>↵</kbd> to select · <kbd>Esc</kbd> to close</span>
+  </p>
+</dialog>
 
 <script>
   // Theme toggle — shares the `starlight-theme` localStorage key so the choice
@@ -171,10 +171,10 @@ const moreActive = moreLinks.some((link) => isActive(link.match));
     }
   });
 
-  // Search (Cmd/Ctrl+K) — reuses Starlight's Pagefind index. Assets are lazily
-  // loaded the first time the modal opens and only exist in a production build.
+  // Search (Cmd/Ctrl+K) — a native <dialog> reusing Starlight's Pagefind index.
+  // Assets are lazily loaded on first open and only exist in a production build.
   const searchBtn = document.getElementById('gr-search-btn');
-  const searchModal = document.getElementById('gr-search');
+  const searchModal = document.getElementById('gr-search') as HTMLDialogElement | null;
   const searchUnavailable = searchModal?.querySelector('.gr-search__unavailable') as HTMLElement | null;
   const pagefindBase = searchModal?.getAttribute('data-pagefind-base') ?? '/pagefind/';
   let searchReady: Promise<boolean> | null = null;
@@ -206,33 +206,26 @@ const moreActive = moreLinks.some((link) => isActive(link.match));
   }
 
   async function openSearch() {
-    if (!searchModal) return;
-    searchModal.hidden = false;
-    document.documentElement.style.overflow = 'hidden';
+    if (!searchModal || searchModal.open) return;
+    searchModal.showModal();
     const ok = await loadSearch();
+    if (searchUnavailable) searchUnavailable.hidden = ok;
     if (ok) {
-      if (searchUnavailable) searchUnavailable.hidden = true;
-      const input = searchModal.querySelector<HTMLInputElement>('.pagefind-ui__search-input');
-      input?.focus();
-    } else if (searchUnavailable) {
-      searchUnavailable.hidden = false;
+      searchModal.querySelector<HTMLInputElement>('.pagefind-ui__search-input')?.focus();
     }
   }
 
-  function closeSearch() {
-    if (!searchModal) return;
-    searchModal.hidden = true;
-    document.documentElement.style.overflow = '';
-  }
-
   searchBtn?.addEventListener('click', openSearch);
-  searchModal?.querySelector('[data-search-close]')?.addEventListener('click', closeSearch);
+  // Click on the ::backdrop (outside the dialog box) closes it.
+  searchModal?.addEventListener('click', (e) => {
+    if (e.target === searchModal) searchModal.close();
+  });
+  // <dialog> handles Escape itself; just intercept Cmd/Ctrl+K to open/toggle.
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      searchModal?.hidden ? openSearch() : closeSearch();
-    } else if (e.key === 'Escape' && searchModal && !searchModal.hidden) {
-      closeSearch();
+      if (searchModal?.open) searchModal.close();
+      else openSearch();
     }
   });
 </script>

@@ -2,6 +2,7 @@ node_modules/
 dist/
 .astro/
 .env
+.claude/
 
 # Generated at build from the platform's schema/catalog/ (see scripts/build-schemas.mjs)
 public/schema/

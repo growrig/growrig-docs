@@ -312,38 +312,29 @@ img {
   }
 }
 
-.gr-search[hidden] {
-  display: none;
-}
+/* Native <dialog>: closed state is display:none via the UA stylesheet. */
 .gr-search {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: clamp(1rem, 8vh, 6rem) 1rem 1rem;
-}
-.gr-search__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-}
-.gr-search__dialog {
-  position: relative;
-  display: flex;
-  flex-direction: column;
   width: 100%;
   max-width: 560px;
   max-height: 80vh;
+  margin: clamp(1rem, 8vh, 6rem) auto auto;
+  padding: 0;
   background: var(--gr-bg);
+  color: var(--gr-text);
   border: 1px solid var(--gr-border);
   border-radius: 14px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+}
+.gr-search[open] {
+  display: flex;
+  flex-direction: column;
   animation: gr-search-in 0.14s ease-out;
+}
+.gr-search::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 @keyframes gr-search-in {
   from {
