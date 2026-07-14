@@ -79,14 +79,24 @@ using. See [Supported devices → Smart plugs](/devices/plug/).
 To vary fan speed smoothly (instead of just on/off), GrowRig uses a small **Grow
 Controller** — an ESP32 board running open [ESPHome](https://esphome.io/) firmware that
 drives PWM fans and reads sensors, with safe local fallback. You can start without one
-and add it when you want finer control. See
+and add it when you want finer control — see
+[Add a Grow Controller](/getting-started/controller/) and
 [Supported devices → Controllers](/devices/controller/).
 
-## 7. The computer that runs it (Grow Hub)
+## 7. The computer that runs it (your Hub)
 
-GrowRig runs on a small always-on computer in your home running **Home Assistant OS** —
-for example a Raspberry Pi 4/5 or a mini PC. This is your **Grow Hub**: it hosts Home
-Assistant, Grow Core, and your data, all locally.
+GrowRig runs on a small always-on computer in your home — the **Hub** — which hosts
+Home Assistant, Grow Core, the Grow App, and your data, all locally. You have three
+ways to get one, from most turnkey to most hands-on:
+
+- **Buy a GrowRig Hub** — our ready-made Hub, unboxed and running *(planned)*.
+- **Build a DIY Hub** — flash our image onto a
+  [Home Assistant Green](https://www.home-assistant.io/green/), a **Raspberry Pi 4+
+  with 2 GB+ RAM**, or a spare mini PC.
+- **Use your own Home Assistant** — already run HAOS? Just add the Grow Core add-on.
+
+[Setting it up](/getting-started/setup/) walks through all three. You don't need to
+decide now — the gear above is the same regardless of which Hub you land on.
 
 Optionally, a spare Wi‑Fi router can act as a **Grow Gateway**, putting your grow
 devices on their own isolated network. This is an advanced step you can add later.
@@ -104,7 +114,7 @@ Two ways to begin, depending on your budget and appetite for tinkering:
 | Sensor | Temp/humidity (Bluetooth) | Temp/humidity + CO₂ |
 | Power | 1 energy-monitoring smart plug | Smart plug(s) |
 | Automation | On/off via smart plug | Grow Controller for smooth fan speed |
-| Hub | Home Assistant on a Raspberry Pi / mini PC | Same, plus a Grow Gateway |
+| Hub | DIY Hub (Raspberry Pi / mini PC) or your own HA | GrowRig Hub or DIY Hub, plus a Grow Gateway |
 
 Once your gear arrives, head to [Setting it up](/getting-started/setup/).
 

@@ -14,7 +14,7 @@ them to use it, but a quick mental model makes setup and troubleshooting much ea
 | --- | --- |
 | **Grow App** | The screen you actually use — dashboards, setup, alerts, and history. |
 | **Grow Core** | The brain. It knows your targets and decides what the equipment should do. |
-| **Grow Hub** | The small computer in your home that runs everything (Home Assistant + Grow Core). |
+| **Hub** | The small computer in your home that runs everything (Home Assistant + Grow Core). Can be a ready-made *GrowRig Hub*, a *DIY Hub* you flash yourself, or your own Home Assistant. |
 | **Grow Gateway** | The network that keeps your grow devices on their own safe Wi‑Fi. *(Optional at first.)* |
 | **Grow Controller** | A small board near the tent that drives fans and reads sensors, with safe local fallback. |
 | **Sensors & equipment** | Your thermometer/hygrometer, fans, light, and plugs. |

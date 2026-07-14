@@ -16,9 +16,14 @@ Mobile.
 stores configuration, evaluates policies, coordinates devices, exposes APIs, and
 communicates with Home Assistant and native devices.
 
-**Grow Hub** — the local computer running Home Assistant OS, Grow Core, the web
-interface, local storage, and optional MQTT/ESPHome services. The Hub is *compute*,
-not networking.
+**Hub** — the general term for the local computer running Home Assistant OS, Grow Core,
+the web interface, local storage, and optional MQTT/ESPHome services. The Hub is
+*compute*, not networking. A Hub can be a ready-made **GrowRig Hub** (our product), a
+**DIY Hub** (HA Green, a Raspberry Pi 4+ with 2 GB+ RAM, or a spare PC flashed with the
+GrowRig image), or your own existing Home Assistant with the Grow Core add-on installed.
+
+**GrowRig Hub** — the productized Hub: a purpose-built computer sold ready to run, with
+Home Assistant OS and Grow Core preinstalled. *(Planned.)*
 
 **Grow Gateway** — the network role providing private Grow Wi-Fi, routing,
 firewalling, isolation from the home LAN, and optional remote access. For now it may be

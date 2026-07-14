@@ -38,9 +38,13 @@ path.
 
 ## Phase 4 — Installation and flashing
 
-HAOS add-on packaging, ESP Web Tools integration, supported board profiles, prebuilt
-firmware manifests, USB/BLE Wi-Fi provisioning, and a controller registration flow.
-**Exit:** a new user can flash and enroll a controller without editing YAML.
+HAOS add-on packaging, a **one-click GrowRig add-on repository** (install Grow Core on
+any Home Assistant without building or copying files), a **prebuilt DIY Hub image**
+(Home Assistant OS + Grow Core in a single flashable disk image for HA Green, a
+Raspberry Pi 4+, or a spare PC), ESP Web Tools integration, supported board profiles,
+prebuilt firmware manifests, USB/BLE Wi-Fi provisioning, and a controller registration
+flow. **Exit:** a new user can stand up a Hub and enroll a controller without editing
+YAML. See the three Hub paths in [Setting it up](/getting-started/setup/).
 
 ## Phase 5 — Grow App ◐
 
@@ -57,7 +61,7 @@ The Flutter **Grow App Mobile** and full alerting remain ahead.
 ## Phase 6 — Gateway profile
 
 Documented router setup, a recommended OpenWrt configuration, a default firewall
-model, camera isolation, and Grow Hub discovery across the gateway. **Exit:** a
+model, camera isolation, and Hub discovery across the gateway. **Exit:** a
 reproducible isolated Grow Network on commodity hardware.
 
 ## Phase 7 — Hardware maturity
@@ -68,9 +72,11 @@ enough evidence to design Grow Controller X4 hardware.
 
 ## Phase 8 — Ecosystem expansion
 
-Sensor Pod, Irrigation Controller, Grow Panel, a hardware compatibility catalog, a
-recipe repository, verified third-party equipment, and an optional official Grow
-Gateway.
+The **GrowRig Hub** — a ready-made, purpose-built Hub sold with Home Assistant OS and
+Grow Core preinstalled, so the turnkey path in [Setting it up](/getting-started/setup/)
+becomes real — plus a Sensor Pod, Irrigation Controller, Grow Panel, a hardware
+compatibility catalog, a recipe repository, verified third-party equipment, and an
+optional official Grow Gateway.
 
 ## Continuous directions
 

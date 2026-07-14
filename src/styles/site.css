@@ -263,6 +263,131 @@ img {
   display: none;
 }
 
+/* ---------- Search ---------- */
+.gr-search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 0.55rem 0 0.7rem;
+  border-radius: 9px;
+  border: 1px solid var(--gr-border);
+  background: transparent;
+  color: var(--gr-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.gr-search-btn:hover {
+  color: var(--gr-text);
+  border-color: var(--gr-accent);
+}
+.gr-search-btn__label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.gr-search-btn__kbd {
+  display: inline-flex;
+  gap: 2px;
+}
+.gr-search-btn__kbd kbd {
+  font-family: inherit;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 3px 4px;
+  border-radius: 5px;
+  background: var(--gr-surface-2);
+  color: var(--gr-muted);
+}
+/* Collapse to an icon-only button when the header is tight. */
+@media (max-width: 34rem) {
+  .gr-search-btn {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+  .gr-search-btn__label,
+  .gr-search-btn__kbd {
+    display: none;
+  }
+}
+
+.gr-search[hidden] {
+  display: none;
+}
+.gr-search {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(1rem, 8vh, 6rem) 1rem 1rem;
+}
+.gr-search__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.gr-search__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  background: var(--gr-bg);
+  border: 1px solid var(--gr-border);
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  animation: gr-search-in 0.14s ease-out;
+}
+@keyframes gr-search-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+.gr-search__ui {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.85rem;
+  /* Theme the Pagefind UI (injected at runtime) to match the site. */
+  --pagefind-ui-primary: var(--gr-accent);
+  --pagefind-ui-text: var(--gr-text);
+  --pagefind-ui-background: var(--gr-bg);
+  --pagefind-ui-border: var(--gr-border);
+  --pagefind-ui-tag: var(--gr-surface);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 10px;
+  --pagefind-ui-font: inherit;
+}
+.gr-search__unavailable {
+  padding: 0 1.1rem 1.1rem;
+  color: var(--gr-muted);
+  font-size: 0.9rem;
+}
+.gr-search__unavailable a {
+  color: var(--gr-accent);
+}
+.gr-search__foot {
+  margin: 0;
+  padding: 0.55rem 0.9rem;
+  border-top: 1px solid var(--gr-border);
+  color: var(--gr-muted);
+  font-size: 0.78rem;
+}
+.gr-search__foot kbd {
+  font-family: inherit;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--gr-surface-2);
+}
+
 /* ---------- Buttons ---------- */
 .gr-btn {
   display: inline-flex;
