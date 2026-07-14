@@ -44,6 +44,11 @@ export default defineConfig({
           label: 'GrowRig on GitHub',
           href: 'https://github.com/growrig',
         },
+        {
+          icon: 'discord',
+          label: 'GrowRig on Discord',
+          href: '/discord',
+        },
       ],
       lastUpdated: true,
       customCss: ['./src/styles/custom.css'],
@@ -57,6 +62,16 @@ export default defineConfig({
         {
           label: 'Documentation',
           items: [{ autogenerate: { directory: 'docs' } }],
+        },
+        {
+          label: 'Catalog',
+          items: [
+            { label: 'Devices', link: '/devices/' },
+            { label: 'Products', link: '/products/' },
+            { label: 'Integrations', link: '/integrations/' },
+            { label: 'Species', link: '/species/' },
+            { label: 'Vendors', link: '/vendors/' },
+          ],
         },
       ],
     }),

@@ -6,6 +6,13 @@ sidebar:
   label: What is GrowRig?
 ---
 
+:::caution[Early work in progress]
+GrowRig is in **early development**. The hardware, software, and device profiles are
+still evolving, features may be incomplete or change, and things can break. Expect
+rough edges — feedback and contributions are very welcome. Come say hi and follow
+along on [Discord](/discord).
+:::
+
 GrowRig helps you **monitor and automate the climate** inside a grow tent, box, or
 room — the temperature, humidity, airflow, and lighting your plants live in — so you
 don't have to babysit it by hand.

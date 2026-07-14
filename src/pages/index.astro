@@ -13,6 +13,31 @@ const inventoryCount = totalInventoryCount();
 const integrationCount = totalIntegrationCount();
 const speciesCount = totalSpeciesCount();
 
+// The hero eyebrow shows the latest GitHub release and links to the main repo.
+// The release tag is fetched at build time; if the repo has no releases yet (or
+// the request fails, e.g. offline CI), we fall back to a placeholder version.
+const repoUrl = 'https://github.com/growrig/growrig';
+const fallbackVersion = 'v0.1.0-alpha';
+
+async function fetchLatestRelease(): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('https://api.github.com/repos/growrig/growrig/releases/latest', {
+      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'growrig-docs' },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data.tag_name === 'string' && data.tag_name ? data.tag_name : null;
+  } catch {
+    return null;
+  }
+}
+
+const releaseVersion = (await fetchLatestRelease()) ?? fallbackVersion;
+
 const features = [
   {
     title: 'Local-first',
@@ -52,7 +77,9 @@ const flow = [
   <!-- Hero -->
   <section class="gr-hero">
     <div class="gr-container gr-hero__inner">
-      <span class="gr-eyebrow"><span class="dot"></span> Concept &amp; prototype · open source</span>
+      <a class="gr-eyebrow gr-eyebrow--link" href={repoUrl} target="_blank" rel="noopener">
+        <span class="dot"></span> {releaseVersion} · open source
+      </a>
       <h1>Grow automation you <span class="accent">actually control</span></h1>
       <p class="lead">
         GrowRig is an open, local-first ecosystem for monitoring and automating grow tents, boxes,
