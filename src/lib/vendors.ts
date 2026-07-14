@@ -1,7 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { allProducts, productCount } from './devices';
+import { allProducts, productCount, loadCategories } from './devices';
+import type { Product } from './devices';
 import { resolveCatalogDir } from './catalog-paths';
 
 export interface Vendor {
@@ -12,6 +13,25 @@ export interface Vendor {
   color?: string;
   background?: string;
   productCount: number;
+}
+
+/** A vendor's supported products, grouped by device category (catalog order). */
+export interface VendorCategoryProducts {
+  slug: string;
+  name: string;
+  products: Product[];
+}
+
+export function findVendor(id: string): Vendor | undefined {
+  return loadVendors().find((vendor) => vendor.id === id);
+}
+
+/** Products attributed to a vendor, grouped by category and ordered like the catalog. */
+export function vendorProductsByCategory(id: string): VendorCategoryProducts[] {
+  return loadCategories().flatMap((category) => {
+    const products = category.products.filter((product) => product.vendor === id);
+    return products.length > 0 ? [{ slug: category.slug, name: category.name, products }] : [];
+  });
 }
 
 function root(): string {

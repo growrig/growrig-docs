@@ -1,0 +1,154 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import CatalogCallout from '../../components/CatalogCallout.astro';
+import DeviceArtwork from '../../components/DeviceArtwork.astro';
+import { loadVendors, vendorProductsByCategory, type Vendor } from '../../lib/vendors';
+
+export function getStaticPaths() {
+  return loadVendors().map((vendor) => ({ params: { slug: vendor.id }, props: { vendor } }));
+}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { vendor } = Astro.props as { vendor: Vendor };
+const groups = vendorProductsByCategory(vendor.id);
+const initials = vendor.name
+  .split(/\s+/)
+  .map((word) => word[0])
+  .join('')
+  .slice(0, 3);
+---
+
+<SiteLayout
+  title={`${vendor.name} — Vendors — GrowRig`}
+  description={`${vendor.name} hardware supported by GrowRig: ${vendor.productCount} product${vendor.productCount === 1 ? '' : 's'} with known profiles.`}
+>
+  <div class="gr-container gr-page-head">
+    <nav class="gr-breadcrumb">
+      <a href={`${base}/vendors/`}>Vendors</a>
+      <span>/</span>
+      <span>{vendor.name}</span>
+    </nav>
+
+    <div class="gr-vendor-hero">
+      <span
+        class="gr-vendor-hero__mark"
+        style={`--vendor-color:${vendor.color ?? '#34b16a'};--vendor-background:${vendor.background ?? '#17231c'}`}
+      >
+        {vendor.logo ? <img src={vendor.logo} alt={`${vendor.name} logo`} /> : <span>{initials}</span>}
+      </span>
+      <div class="gr-vendor-hero__meta">
+        <h1>{vendor.name}</h1>
+        <p>
+          {vendor.productCount} supported product{vendor.productCount === 1 ? '' : 's'} with known GrowRig profiles.
+        </p>
+        {vendor.website && (
+          <a class="gr-btn gr-btn--ghost" href={vendor.website} target="_blank" rel="noopener">
+            Visit website →
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <section class="gr-section" style="padding-top: 1.5rem;">
+    <div class="gr-container">
+      {groups.length === 0 ? (
+        <p class="gr-empty">No supported products from {vendor.name} yet.</p>
+      ) : (
+        <div class="gr-device-groups">
+          {groups.map((group) => (
+            <section class="gr-device-group">
+              <h2>
+                <a href={`${base}/devices/${group.slug}/`}>{group.name}</a>
+              </h2>
+              <div class="gr-device-grid">
+                {group.products.map((d) => (
+                  <a class="gr-device-card" href={`${base}/devices/${d.category}/${d.slug}/`}>
+                    <DeviceArtwork product={d} vendor={vendor} />
+                    <span class="gr-device-card__brand">{d.brand || group.name}</span>
+                    <h3>{d.model || d.title}</h3>
+                    {d.description && <p>{d.description}</p>}
+                    {d.models.length > 0 && (
+                      <ul class="gr-device-card__models" aria-label="Models in this series">
+                        {d.models.map((model) => <li>{model.model ?? model.id}</li>)}
+                      </ul>
+                    )}
+                    <span class="gr-tags">
+                      <span class="gr-tag">{d.connectionLabel}</span>
+                      {d.haIntegration && <span class="gr-tag">{d.haIntegration}</span>}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+
+      <CatalogCallout noun="vendors" docsPath="/docs/adding-a-device/" docsLabel="Add a vendor" />
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .gr-vendor-hero {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+  }
+  .gr-vendor-hero__mark {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 18px;
+    background: var(--gr-surface);
+    border: 1px solid var(--gr-border);
+    overflow: hidden;
+  }
+  .gr-vendor-hero__mark img {
+    max-width: 78%;
+    max-height: 78%;
+    object-fit: contain;
+  }
+  .gr-vendor-hero__mark > span {
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: 0.02em;
+    color: var(--vendor-color, var(--gr-accent));
+    background: var(--vendor-background, transparent);
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gr-vendor-hero__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .gr-vendor-hero__meta h1 {
+    margin: 0;
+  }
+  .gr-vendor-hero__meta p {
+    margin: 0;
+    color: var(--gr-muted);
+  }
+  .gr-vendor-hero__meta .gr-btn {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+  }
+  .gr-device-group h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .gr-device-group h2 a:hover {
+    color: var(--gr-accent);
+  }
+</style>
